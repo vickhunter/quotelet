@@ -4,10 +4,11 @@
 import { compileFormula } from '@quotelet/core'
 import type { Config, Quote } from '@quotelet/core/types'
 import { EXAMPLES } from '../../../../packages/aperto/src/examples.ts'
+import { LANGS } from '../../../../packages/aperto/src/types.ts'
 import type { ApiError, ConfigResponse, Lang, MessageResponse } from '../../../../packages/aperto/src/types.ts'
 
 export type { ApiError, ConfigResponse, Lang, MessageResponse }
-export const LANGS: readonly Lang[] = ['it', 'de', 'fr', 'en']
+export { LANGS }
 export const LANG_NAMES: Record<Lang, string> = { it: 'Italiano', de: 'Deutsch', fr: 'Français', en: 'English' }
 export const APERTO_PATH = '/api/aperto'
 const MAX_BODY = 4096

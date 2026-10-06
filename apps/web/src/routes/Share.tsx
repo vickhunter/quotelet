@@ -63,7 +63,7 @@ function SharedCalculator({ config, encoded }: { config: Config; encoded: string
         const r = await requestMessage(config, quote, lang, { signal: ac.signal })
         if (!ac.signal.aborted) setMsg(r.ok ? { key, lang, status: 'ready', text: r.text } : { key, lang, status: 'fallback' })
       } catch { /* aborted */ }
-    }, 300)
+    }, 500) // debounce: the proxy allows about 10 calls per minute per IP
     return () => { ac.abort(); window.clearTimeout(t) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang, quote, config])

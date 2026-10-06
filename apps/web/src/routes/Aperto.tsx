@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { LIMITS, encodeConfig } from '@quotelet/core'
+import { LIMITS, encodeConfig, validateConfig } from '@quotelet/core'
 import type { Config } from '@quotelet/core/types'
 import { APERTO_EXAMPLES, isLang, loadApertoDraft, requestConfig, saveApertoDraft, summarizeConfig, type Lang } from '../lib/aperto'
 import { embedSnippet, shareLink } from '../lib/share'
@@ -58,10 +58,14 @@ export function Aperto() {
     try {
       const r = await requestConfig(text, lang, { signal: ac.signal })
       if (ac.signal.aborted) return
-      if (r.ok) {
-        setConfig(r.config)
-        setStatus({ kind: 'ok', summary: summarizeConfig(r.config), attempts: r.attempts, warnings: r.warnings })
-      } else {
+      // Defense in depth: the server already validated, but the browser never renders an unchecked config.
+      const checked = r.ok ? validateConfig(r.config) : null
+      if (r.ok && checked?.ok) {
+        setConfig(checked.config)
+        setStatus({ kind: 'ok', summary: summarizeConfig(checked.config), attempts: r.attempts, warnings: r.warnings })
+      } else if (checked && !checked.ok) {
+        setStatus({ kind: 'error', attempts: r.attempts, errors: checked.errors })
+      } else if (!r.ok) {
         setStatus({ kind: 'error', attempts: r.attempts, errors: r.errors })
       }
       requestAnimationFrame(() => panel.current?.focus({ preventScroll: false }))

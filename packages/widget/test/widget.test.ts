@@ -161,6 +161,72 @@ describe("widget", () => {
     expect($(el, "ql-result-low")!.dataset.cents).toBe("106000");
   });
 
+  test("data-config-url failure (HTTP 404) shows ql-error and dispatches quotelet:error", async () => {
+    const orig = globalThis.fetch;
+    (globalThis as any).fetch = async () => new Response("nope", { status: 404 });
+    try {
+      const el = host({ "data-quotelet": "", "data-config-url": "/missing.json" });
+      const err = new Promise<any>((r) => el.addEventListener("quotelet:error", (e: any) => r(e.detail)));
+      autoMount(document);
+      const detail = await err;
+      expect(detail.errors[0].message).toContain("404");
+      expect($(el, "ql-error")).not.toBeNull();
+    } finally { globalThis.fetch = orig; }
+  });
+
+  test("a manual mount() while data-config-url is loading wins (no late overwrite)", async () => {
+    const orig = globalThis.fetch;
+    let release!: () => void;
+    (globalThis as any).fetch = () => new Promise((r) => { release = () => r(new Response(JSON.stringify(fx("config-xss-label.json")))); });
+    try {
+      const el = host({ "data-quotelet": "", "data-config-url": "/slow.json" });
+      autoMount(document);
+      mount(el, fx("config-imbianchino.json"));
+      release();
+      await new Promise((r) => setTimeout(r, 10));
+      expect(el.shadowRoot!.textContent).not.toContain("<img src=x");
+      expect($(el, "ql-result-low")!.dataset.cents).toBe("106000");
+    } finally { globalThis.fetch = orig; }
+  });
+
+  test("runtime formula error (division by zero): message shown, CTAs disabled, no lead", async () => {
+    const cfg = fx("config-imbianchino.json");
+    cfg.formula = "1000 / (mq - 5)";
+    const el = host();
+    const ev = record(el);
+    const api = mount(el, cfg);
+    api.update({ mq: 5 });
+    expect($(el, "ql-result-low")!.dataset.cents).toBe("0");
+    expect(($(el, "ql-cta-whatsapp") as HTMLButtonElement).disabled).toBe(true);
+    const name = $(el, "ql-name") as HTMLInputElement;
+    name.value = "Giulia"; name.dispatchEvent(new Event("input", { bubbles: true }));
+    ($(el, "ql-cta-whatsapp") as HTMLElement).click();
+    expect(opened.length).toBe(0);
+    expect(ev.some((e) => e.type === "quotelet:lead")).toBe(false);
+    const q = ev.filter((e) => e.type === "quotelet:quote").pop()!.detail.quote;
+    expect(q.error).toBe("division_by_zero");
+    api.update({ mq: 10 });
+    expect(($(el, "ql-cta-whatsapp") as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  test("email CTA: mailto handoff + quotelet:lead {channel: 'email'}", async () => {
+    const assigned: string[] = [];
+    const loc = window.location as any;
+    const origAssign = loc.assign;
+    Object.defineProperty(loc, "assign", { value: (u: string) => assigned.push(u), configurable: true, writable: true });
+    try {
+      const el = host();
+      const ev = record(el);
+      mount(el, fx("config-imbianchino.json"));
+      const name = $(el, "ql-name") as HTMLInputElement;
+      name.value = "Giulia"; name.dispatchEvent(new Event("input", { bubbles: true }));
+      ($(el, "ql-cta-email") as HTMLElement).click();
+      expect(assigned.length).toBe(1);
+      expect(assigned[0].startsWith("mailto:info@example.it?subject=")).toBe(true);
+      expect(ev.find((e) => e.type === "quotelet:lead")!.detail).toEqual({ channel: "email", id: "imbianchino-it" });
+    } finally { Object.defineProperty(loc, "assign", { value: origAssign, configurable: true, writable: true }); }
+  });
+
   test("no localStorage / sessionStorage / document.cookie access (spy)", () => {
     expect(storageHits).toBe(0);
   });

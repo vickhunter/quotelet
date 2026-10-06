@@ -5,7 +5,7 @@ export type Strings = {
   greetOwner(business: string, name: string): string; greetShare(business: string, name: string): string;
   request(title: string): string; estimate: string; withVat: string; mailSubject(title: string, name: string): string;
   ctaWhatsApp: string; ctaShare: string; ctaEmail: string; nameLabel: string; namePlaceholder: string;
-  nameRequired: string; errorTitle: string; poweredBy: string; estimateLabel: string;
+  nameRequired: string; calcError: string; errorTitle: string; poweredBy: string; estimateLabel: string;
 };
 const it: Strings = {
   yes: "Sì", no: "No",
@@ -15,6 +15,7 @@ const it: Strings = {
   mailSubject: (t, n) => `Richiesta preventivo: ${t} (${n})`,
   ctaWhatsApp: "Invia su WhatsApp", ctaShare: "Condividi la stima su WhatsApp", ctaEmail: "Invia per email",
   nameLabel: "Il tuo nome", namePlaceholder: "Nome", nameRequired: "Scrivi il tuo nome per inviare la richiesta.",
+  calcError: "Con queste risposte non è possibile calcolare una stima. Modifica i valori.",
   errorTitle: "Questo calcolatore non è configurato correttamente.", poweredBy: "Creato con Quotelet", estimateLabel: "Stima",
 };
 const en: Strings = {
@@ -25,6 +26,7 @@ const en: Strings = {
   mailSubject: (t, n) => `Quote request: ${t} (${n})`,
   ctaWhatsApp: "Send on WhatsApp", ctaShare: "Share the estimate on WhatsApp", ctaEmail: "Send by email",
   nameLabel: "Your name", namePlaceholder: "Name", nameRequired: "Please enter your name to send the request.",
+  calcError: "These answers cannot produce an estimate. Please change the values.",
   errorTitle: "This calculator is not configured correctly.", poweredBy: "Made with Quotelet", estimateLabel: "Estimate",
 };
 export function strings(locale: string | undefined | null): Strings {

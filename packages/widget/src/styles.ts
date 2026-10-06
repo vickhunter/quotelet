@@ -20,6 +20,7 @@ input[aria-invalid=true]{border-color:#b42318}
 .lb{font-size:13px;font-weight:600;opacity:.75}
 .amt{font-size:24px;font-weight:700;overflow-wrap:anywhere}
 .sm{font-size:13px;opacity:.8;margin-top:4px;overflow-wrap:anywhere}
+.disc{margin:0 0 12px}
 .hint{font-size:13px;color:#b42318;margin-top:4px}
 button{display:block;width:100%;min-height:48px;margin-top:8px;border:0;border-radius:var(--ql-radius,12px);background:var(--ql-accent,#2563eb);color:#fff;font-weight:700;cursor:pointer}
 button.alt{background:transparent;color:var(--ql-accent,#2563eb);border:1px solid currentColor}

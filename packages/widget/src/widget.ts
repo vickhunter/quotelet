@@ -14,6 +14,8 @@ export type Handle = { update(answers: Partial<Answers>): void; destroy(): void 
 const NOOP: Handle = { update() {}, destroy() {} };
 const MAX_CONFIG_BYTES = 64 * 1024;
 const live = new WeakMap<Element, Handle>();
+/** Pending data-config-url loads; a manual mount()/destroy() in the meantime cancels them. */
+const pending = new WeakMap<Element, object>();
 
 type Attrs = Record<string, string | boolean | number | undefined>;
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Attrs = {}, text?: string, kids: (Node | null)[] = []): HTMLElementTagNameMap[K] {
@@ -58,6 +60,7 @@ function renderError(host: Element, root: ShadowRoot, errors: ValidationError[],
 export function mount(el: Element, configOrEncoded: unknown): Handle {
   try {
     if (!el || typeof (el as Element).attachShadow !== "function") return NOOP;
+    pending.delete(el);
     live.get(el)?.destroy();
     const root = shadowOf(el);
     const r = resolve(configOrEncoded);
@@ -108,7 +111,8 @@ function render(host: Element, root: ShadowRoot, config: Config): Handle {
   const low = h("span", { class: "amt", "data-testid": "ql-result-low" });
   const high = h("span", { class: "amt", "data-testid": "ql-result-high" });
   const vat = h("p", { class: "sm", "data-testid": "ql-vat-note" });
-  const disc = h("p", { class: "sm", "data-testid": "ql-disclaimer", hidden: !config.disclaimer }, config.disclaimer ?? "");
+  const calcErr = h("p", { class: "hint", role: "alert", hidden: true }, t.calcError);
+  const disc = h("p", { class: "sm disc", "data-testid": "ql-disclaimer", hidden: !config.disclaimer }, config.disclaimer ?? "");
   const name = h("input", { type: "text", id: "ql-name", "data-testid": "ql-name", autocomplete: "given-name", maxlength: 80, placeholder: t.namePlaceholder });
   const hint = h("p", { class: "hint", role: "alert", hidden: true }, t.nameRequired);
   const wa = h("button", { type: "button", "data-testid": "ql-cta-whatsapp" }, config.business.whatsapp ? t.ctaWhatsApp : t.ctaShare);
@@ -119,7 +123,7 @@ function render(host: Element, root: ShadowRoot, config: Config): Handle {
     h("div", { class: "t" }, config.title),
     ...rows,
     h("div", { class: "res", "aria-live": "polite" }, undefined, [
-      h("div", { class: "lb" }, t.estimateLabel), h("div", {}, undefined, [low, document.createTextNode(" – "), high]), vat,
+      h("div", { class: "lb" }, t.estimateLabel), h("div", {}, undefined, [low, document.createTextNode(" – "), high]), vat, calcErr,
     ]),
     disc,
     h("div", { class: "row" }, undefined, [h("label", { for: "ql-name" }, t.nameLabel), name, hint]),
@@ -137,6 +141,10 @@ function render(host: Element, root: ShadowRoot, config: Config): Handle {
     vat.hidden = !quote.display.vatNote;
     vat.dataset.lowGrossCents = String(v.lowGrossCents);
     vat.dataset.highGrossCents = String(v.highGrossCents);
+    // A runtime formula error (e.g. division by zero) yields 0 amounts: say so and never send a 0 € lead.
+    calcErr.hidden = !quote.error;
+    wa.disabled = !!quote.error;
+    if (mail) mail.disabled = !!quote.error;
     emit(host, "quotelet:quote", { quote });
   };
   const sync = () => {
@@ -172,7 +180,7 @@ function render(host: Element, root: ShadowRoot, config: Config): Handle {
   name.addEventListener("input", () => { if (name.value.trim()) { name.removeAttribute("aria-invalid"); hint.hidden = true; } });
 
   const lead = (channel: "whatsapp" | "email") => () => {
-    if (destroyed) return;
+    if (destroyed || quote.error) return;
     try {
       try { cleanLeadName(name.value); } catch {
         name.setAttribute("aria-invalid", "true"); hint.hidden = false;
@@ -212,6 +220,7 @@ function render(host: Element, root: ShadowRoot, config: Config): Handle {
 async function fetchConfig(url: string): Promise<unknown> {
   const res = await fetch(url, { method: "GET", credentials: "omit" });
   if (!res.ok) throw new Error(`Config request failed (HTTP ${res.status})`);
+  if (Number(res.headers.get("content-length") || 0) > MAX_CONFIG_BYTES) throw new Error("Config file is too large");
   const text = await res.text();
   if (text.length > MAX_CONFIG_BYTES) throw new Error("Config file is too large");
   return JSON.parse(text);
@@ -227,7 +236,12 @@ export function autoMount(scope: ParentNode = document): void {
       const url = el.getAttribute("data-config-url");
       if (encoded) mount(el, encoded);
       else if (url) {
-        fetchConfig(url).then((c) => mount(el, c), (e) => {
+        const token = {};
+        pending.set(el, token);
+        const current = () => pending.get(el) === token;
+        fetchConfig(url).then((c) => { if (current()) mount(el, c); }, (e) => {
+          if (!current()) return;
+          pending.delete(el);
           try { renderError(el, shadowOf(el), [{ path: "", message: e instanceof Error ? e.message : "Config could not be loaded" }]); } catch { /* ignore */ }
         });
       } else mount(el, undefined);

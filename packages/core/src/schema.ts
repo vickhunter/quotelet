@@ -48,6 +48,7 @@ export function validateConfig(input: unknown): ValidateResult {
       const b = input.business;
       business.name = text("business.name", b.name, LIMITS.maxLabel, { required: true }) ?? "";
       if (has(b, "whatsapp") && b.whatsapp !== null && b.whatsapp !== "") {
+        // A JSON number is accepted: <=15 digits is below 2^53, so String() is exact. Strings are preferred.
         const raw = typeof b.whatsapp === "number" ? String(b.whatsapp) : b.whatsapp;
         if (typeof raw !== "string") err("business.whatsapp", "must be a phone number (digits only, 8-15 long)");
         else {

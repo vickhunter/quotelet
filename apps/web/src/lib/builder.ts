@@ -33,16 +33,23 @@ const EMPTY: Config = {
 
 export const initBuilder = (): BuilderState => ({ templateId: '', config: EMPTY, whatsappRaw: '', formula: EMPTY.formula })
 
-export const normalizeWhatsapp = (raw: string) => raw.replace(/\D/g, '')
+/** Digits only, as wa.me wants them. A leading 00 is the international prefix (like +) and is dropped. */
+export const normalizeWhatsapp = (raw: string) => {
+  const d = raw.replace(/\D/g, '')
+  return /^[\s(]*00/.test(raw) ? d.slice(2) : d
+}
 
 /** Dictionary keys whatsappProblemKey can return (see i18n.ts). */
-export const builderStrings = ['wa.digits', 'wa.short', 'wa.long'] as const
+export const builderStrings = ['wa.digits', 'wa.short', 'wa.long', 'wa.prefix'] as const
 export type WhatsappProblem = (typeof builderStrings)[number]
 
 export function whatsappProblemKey(raw: string): WhatsappProblem | null {
   if (!raw.trim()) return null
   if (/[a-z]/i.test(raw)) return 'wa.digits'
   const d = normalizeWhatsapp(raw)
+  // Italian mobile typed without the country code ("333 000 0000"): wa.me would get the wrong number.
+  // Flag it instead of guessing +39.
+  if (!/^[\s(]*(\+|00)/.test(raw) && /^3\d{8,9}$/.test(d)) return 'wa.prefix'
   if (d.length < 8) return 'wa.short'
   if (d.length > 15) return 'wa.long'
   return null

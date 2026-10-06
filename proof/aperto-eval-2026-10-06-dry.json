@@ -1,0 +1,91 @@
+{
+ "date": "2026-10-06",
+ "dry": true,
+ "endpoint": "recorded fixtures (offline)",
+ "models": [
+  {
+   "label": "dry-8b",
+   "model": "dry-8b (synthetic recorded answers)",
+   "cases": 30,
+   "valid": 28,
+   "validRate": 0.9333333333333333,
+   "firstTry": 23,
+   "repaired": 5,
+   "matched": 18,
+   "matchRate": 0.6,
+   "inputMatchRate": 0.7666666666666667,
+   "clearMatchRate": 0.6538461538461539,
+   "ambiguousMatchRate": 0.25,
+   "latencyMeanMs": 1918,
+   "latencyP50Ms": 1663,
+   "latencyP95Ms": 3619,
+   "tokensIn": 58679,
+   "tokensOut": 5798,
+   "tokensPerCalc": 2149,
+   "byLang": {
+    "it": {
+     "cases": 10,
+     "valid": 10,
+     "matched": 6
+    },
+    "de": {
+     "cases": 8,
+     "valid": 7,
+     "matched": 5
+    },
+    "fr": {
+     "cases": 6,
+     "valid": 5,
+     "matched": 3
+    },
+    "en": {
+     "cases": 6,
+     "valid": 6,
+     "matched": 4
+    }
+   }
+  },
+  {
+   "label": "dry-70b",
+   "model": "dry-70b (synthetic recorded answers)",
+   "cases": 30,
+   "valid": 30,
+   "validRate": 1,
+   "firstTry": 28,
+   "repaired": 2,
+   "matched": 27,
+   "matchRate": 0.9,
+   "inputMatchRate": 0.9555555555555556,
+   "clearMatchRate": 0.9230769230769231,
+   "ambiguousMatchRate": 0.75,
+   "latencyMeanMs": 5221,
+   "latencyP50Ms": 4762,
+   "latencyP95Ms": 10377,
+   "tokensIn": 48674,
+   "tokensOut": 5196,
+   "tokensPerCalc": 1796,
+   "byLang": {
+    "it": {
+     "cases": 10,
+     "valid": 10,
+     "matched": 9
+    },
+    "de": {
+     "cases": 8,
+     "valid": 8,
+     "matched": 7
+    },
+    "fr": {
+     "cases": 6,
+     "valid": 6,
+     "matched": 5
+    },
+    "en": {
+     "cases": 6,
+     "valid": 6,
+     "matched": 6
+    }
+   }
+  }
+ ]
+}

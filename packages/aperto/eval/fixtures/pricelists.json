@@ -1,0 +1,1889 @@
+[
+ {
+  "id": "it-imbianchino-padova",
+  "lang": "it",
+  "text": "Imbiancatura a Padova: 8 € al m² di pareti, soffitti oltre 3 m +20%, trattamento antimuffa 4 € al m², minimo 200 €, IVA 22% esclusa",
+  "gold": {
+   "v": 1,
+   "id": "imbiancatura-padova",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa imbiancare?",
+   "business": {
+    "name": "Imbiancatura Padova"
+   },
+   "fields": [
+    {
+     "id": "mq_pareti",
+     "type": "number",
+     "label": "Metri quadri di pareti",
+     "unit": "m²",
+     "min": 1,
+     "max": 2000,
+     "step": 1,
+     "default": 100
+    },
+    {
+     "id": "soffitti_alti",
+     "type": "toggle",
+     "label": "Soffitti oltre 3 m",
+     "on": 1.2,
+     "off": 1,
+     "default": false
+    },
+    {
+     "id": "mq_muffa",
+     "type": "number",
+     "label": "m² con antimuffa",
+     "unit": "m²",
+     "min": 0,
+     "max": 500,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "max(200, mq_pareti * 8 * soffitti_alti + mq_muffa * 4)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "mq_pareti": 100
+   },
+   {
+    "mq_pareti": 250,
+    "soffitti_alti": true,
+    "mq_muffa": 20
+   },
+   {
+    "mq_pareti": 10
+   }
+  ]
+ },
+ {
+  "id": "it-traslochi-milano",
+  "lang": "it",
+  "text": "Traslochi Milano: 40 € al metro cubo, 15 € per piano senza ascensore, smontaggio mobili 25 € a mobile, minimo 250 €. IVA 22% esclusa.",
+  "gold": {
+   "v": 1,
+   "id": "traslochi-milano",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa il trasloco?",
+   "business": {
+    "name": "Traslochi Milano"
+   },
+   "fields": [
+    {
+     "id": "mc",
+     "type": "number",
+     "label": "Metri cubi",
+     "unit": "m³",
+     "min": 1,
+     "max": 200,
+     "step": 1,
+     "default": 20
+    },
+    {
+     "id": "piani",
+     "type": "number",
+     "label": "Piani",
+     "min": 0,
+     "max": 20,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "senza_ascensore",
+     "type": "toggle",
+     "label": "Senza ascensore",
+     "on": 1,
+     "off": 0,
+     "default": false
+    },
+    {
+     "id": "mobili",
+     "type": "number",
+     "label": "Mobili da smontare",
+     "min": 0,
+     "max": 50,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "max(250, mc * 40 + piani * 15 * senza_ascensore + mobili * 25)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "mc": 20
+   },
+   {
+    "mc": 35,
+    "piani": 4,
+    "senza_ascensore": true,
+    "mobili": 3
+   },
+   {
+    "mc": 3,
+    "piani": 2
+   }
+  ]
+ },
+ {
+  "id": "it-pulizie-torino",
+  "lang": "it",
+  "text": "Pulizie appartamenti a Torino: 2,50 € al m², pulizia vetri 3 € a finestra, sgrassatura cucina 40 € forfait, minimo 80 €, prezzi IVA inclusa 22%.",
+  "gold": {
+   "v": 1,
+   "id": "pulizie-torino",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa la pulizia?",
+   "business": {
+    "name": "Pulizie Torino"
+   },
+   "fields": [
+    {
+     "id": "mq",
+     "type": "number",
+     "label": "Metri quadri",
+     "unit": "m²",
+     "min": 10,
+     "max": 500,
+     "step": 1,
+     "default": 70
+    },
+    {
+     "id": "finestre",
+     "type": "number",
+     "label": "Finestre",
+     "min": 0,
+     "max": 40,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "cucina",
+     "type": "toggle",
+     "label": "Sgrassatura cucina",
+     "on": 40,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "max(80, mq * 2.5 + finestre * 3 + cucina)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 22,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "mq": 70
+   },
+   {
+    "mq": 120,
+    "finestre": 10,
+    "cucina": true
+   },
+   {
+    "mq": 20
+   }
+  ]
+ },
+ {
+  "id": "it-giardiniere-bologna",
+  "lang": "it",
+  "text": "Giardiniere a Bologna: taglio erba 0,40 € al m², potatura siepi 6 € al metro lineare, uscita 30 €.",
+  "gold": {
+   "v": 1,
+   "id": "giardiniere-bologna",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa il giardiniere?",
+   "business": {
+    "name": "Giardiniere Bologna"
+   },
+   "fields": [
+    {
+     "id": "mq_prato",
+     "type": "number",
+     "label": "Metri quadri di prato",
+     "unit": "m²",
+     "min": 0,
+     "max": 5000,
+     "step": 1,
+     "default": 200
+    },
+    {
+     "id": "metri_siepe",
+     "type": "number",
+     "label": "Metri di siepe",
+     "unit": "m",
+     "min": 0,
+     "max": 500,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "30 + mq_prato * 0.4 + metri_siepe * 6",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "mq_prato": 200
+   },
+   {
+    "mq_prato": 800,
+    "metri_siepe": 40
+   },
+   {
+    "mq_prato": 0,
+    "metri_siepe": 15
+   }
+  ]
+ },
+ {
+  "id": "it-idraulico-roma",
+  "lang": "it",
+  "text": "Idraulico a Roma: diritto di chiamata 40 €, manodopera 35 € l'ora, urgenza nel weekend +50%. IVA 22% esclusa.",
+  "gold": {
+   "v": 1,
+   "id": "idraulico-roma",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa l'idraulico?",
+   "business": {
+    "name": "Idraulico Roma"
+   },
+   "fields": [
+    {
+     "id": "ore",
+     "type": "number",
+     "label": "Ore di lavoro",
+     "unit": "h",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 2
+    },
+    {
+     "id": "weekend",
+     "type": "toggle",
+     "label": "Urgenza nel weekend",
+     "on": 1.5,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "(40 + ore * 35) * weekend",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "ore": 2
+   },
+   {
+    "ore": 3,
+    "weekend": true
+   },
+   {
+    "ore": 8
+   }
+  ]
+ },
+ {
+  "id": "it-elettricista-lugano",
+  "lang": "it",
+  "text": "Elettricista a Lugano: 95 CHF all'ora, trasferta 50 CHF, presa nuova 60 CHF ciascuna, IVA 8.1% inclusa.",
+  "gold": {
+   "v": 1,
+   "id": "elettricista-lugano",
+   "locale": "it-CH",
+   "currency": "CHF",
+   "title": "Quanto costa l'elettricista?",
+   "business": {
+    "name": "Elettricista Lugano"
+   },
+   "fields": [
+    {
+     "id": "ore",
+     "type": "number",
+     "label": "Ore di lavoro",
+     "unit": "h",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 2
+    },
+    {
+     "id": "prese",
+     "type": "number",
+     "label": "Prese nuove",
+     "min": 0,
+     "max": 30,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "50 + ore * 95 + prese * 60",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "ore": 2
+   },
+   {
+    "ore": 4,
+    "prese": 5
+   },
+   {
+    "ore": 1,
+    "prese": 1
+   }
+  ]
+ },
+ {
+  "id": "it-uffici-bellinzona",
+  "lang": "it",
+  "text": "Pulizia uffici a Bellinzona: 4 CHF al m², abbonamento settimanale -15%, minimo 150 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "uffici-bellinzona",
+   "locale": "it-CH",
+   "currency": "CHF",
+   "title": "Quanto costa la pulizia dell'ufficio?",
+   "business": {
+    "name": "Pulizia uffici Bellinzona"
+   },
+   "fields": [
+    {
+     "id": "mq",
+     "type": "number",
+     "label": "Metri quadri",
+     "unit": "m²",
+     "min": 10,
+     "max": 3000,
+     "step": 1,
+     "default": 100
+    },
+    {
+     "id": "abbonamento",
+     "type": "toggle",
+     "label": "Abbonamento settimanale",
+     "on": 0.85,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "max(150, mq * 4 * abbonamento)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "mq": 100
+   },
+   {
+    "mq": 300,
+    "abbonamento": true
+   },
+   {
+    "mq": 20
+   }
+  ]
+ },
+ {
+  "id": "it-fotografo-firenze",
+  "lang": "it",
+  "text": "Fotografo matrimoni a Firenze: servizio base 900 €, ogni ora extra 120 €, album 250 €, secondo fotografo +300 €.",
+  "gold": {
+   "v": 1,
+   "id": "fotografo-firenze",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa il fotografo?",
+   "business": {
+    "name": "Fotografo Firenze"
+   },
+   "fields": [
+    {
+     "id": "ore_extra",
+     "type": "number",
+     "label": "Ore extra",
+     "unit": "h",
+     "min": 0,
+     "max": 12,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "album",
+     "type": "toggle",
+     "label": "Album",
+     "on": 250,
+     "off": 0,
+     "default": false
+    },
+    {
+     "id": "secondo",
+     "type": "toggle",
+     "label": "Secondo fotografo",
+     "on": 300,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "900 + ore_extra * 120 + album + secondo",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {},
+   {
+    "ore_extra": 3,
+    "album": true
+   },
+   {
+    "ore_extra": 1,
+    "album": true,
+    "secondo": true
+   }
+  ]
+ },
+ {
+  "id": "it-giardinaggio-vago",
+  "lang": "it",
+  "ambiguous": true,
+  "note": "\"un po' di più nei festivi\" has no number: the gold ignores it",
+  "text": "Lavori di giardinaggio: 30 € l'ora, minimo 2 ore, un po' di più nei giorni festivi.",
+  "gold": {
+   "v": 1,
+   "id": "giardinaggio",
+   "locale": "it-IT",
+   "currency": "EUR",
+   "title": "Quanto costa il giardinaggio?",
+   "business": {
+    "name": "Giardinaggio"
+   },
+   "fields": [
+    {
+     "id": "ore",
+     "type": "number",
+     "label": "Ore",
+     "unit": "h",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 3
+    }
+   ],
+   "formula": "max(2, ore) * 30",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "ore": 3
+   },
+   {
+    "ore": 1
+   },
+   {
+    "ore": 8
+   }
+  ]
+ },
+ {
+  "id": "it-sci-airolo",
+  "lang": "it",
+  "text": "Lezioni di sci ad Airolo: 70 CHF l'ora per una persona, ogni persona in più 20 CHF l'ora, pacchetto da 5 ore sconto 10%.",
+  "gold": {
+   "v": 1,
+   "id": "sci-airolo",
+   "locale": "it-CH",
+   "currency": "CHF",
+   "title": "Quanto costa la lezione di sci?",
+   "business": {
+    "name": "Scuola sci Airolo"
+   },
+   "fields": [
+    {
+     "id": "ore",
+     "type": "number",
+     "label": "Ore",
+     "unit": "h",
+     "min": 1,
+     "max": 20,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "id": "persone_extra",
+     "type": "number",
+     "label": "Persone in più",
+     "min": 0,
+     "max": 5,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "pacchetto",
+     "type": "toggle",
+     "label": "Pacchetto da 5 ore",
+     "on": 0.9,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "ore * (70 + persone_extra * 20) * pacchetto",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "ore": 1
+   },
+   {
+    "ore": 5,
+    "persone_extra": 2,
+    "pacchetto": true
+   },
+   {
+    "ore": 2,
+    "persone_extra": 1
+   }
+  ]
+ },
+ {
+  "id": "de-umzug-lugano",
+  "lang": "de",
+  "text": "Umzug: 45 CHF pro m³, +20 CHF pro Stockwerk ohne Lift, mindestens 300 CHF, MwSt 8.1% inklusive",
+  "gold": {
+   "v": 1,
+   "id": "umzug-lugano",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet Ihr Umzug?",
+   "business": {
+    "name": "Umzug"
+   },
+   "fields": [
+    {
+     "id": "volumen",
+     "type": "number",
+     "label": "Umzugsvolumen",
+     "unit": "m³",
+     "min": 1,
+     "max": 200,
+     "step": 1,
+     "default": 20
+    },
+    {
+     "id": "etage_auszug",
+     "type": "number",
+     "label": "Stockwerk Auszug",
+     "min": 0,
+     "max": 20,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "etage_einzug",
+     "type": "number",
+     "label": "Stockwerk Einzug",
+     "min": 0,
+     "max": 20,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "ohne_lift",
+     "type": "toggle",
+     "label": "Kein Lift",
+     "on": 1,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "max(300, volumen * 45 + (etage_auszug + etage_einzug) * 20 * ohne_lift)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "volumen": 20,
+    "etage_auszug": 3,
+    "ohne_lift": true
+   },
+   {
+    "volumen": 5
+   },
+   {
+    "volumen": 40,
+    "etage_auszug": 2,
+    "etage_einzug": 4,
+    "ohne_lift": true
+   }
+  ]
+ },
+ {
+  "id": "de-maler-zuerich",
+  "lang": "de",
+  "text": "Malerarbeiten Zürich: 28 CHF pro m² Wandfläche, Decken +25%, Abdeckarbeiten pauschal 150 CHF, Mindestauftrag 800 CHF, Preise exkl. 8.1% MWST.",
+  "gold": {
+   "v": 1,
+   "id": "maler-zuerich",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kosten Malerarbeiten?",
+   "business": {
+    "name": "Maler Zürich"
+   },
+   "fields": [
+    {
+     "id": "flaeche",
+     "type": "number",
+     "label": "Wandfläche",
+     "unit": "m²",
+     "min": 1,
+     "max": 2000,
+     "step": 1,
+     "default": 80
+    },
+    {
+     "id": "decken",
+     "type": "toggle",
+     "label": "Mit Decken",
+     "on": 1.25,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "max(800, flaeche * 28 * decken + 150)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "flaeche": 80
+   },
+   {
+    "flaeche": 150,
+    "decken": true
+   },
+   {
+    "flaeche": 10
+   }
+  ]
+ },
+ {
+  "id": "de-reinigung-bern",
+  "lang": "de",
+  "text": "Wohnungsreinigung mit Abnahmegarantie in Bern: 1-Zimmer 450 CHF, 2-Zimmer 650 CHF, 3-Zimmer 850 CHF, 4-Zimmer 1050 CHF, Balkon +50 CHF, MwSt inbegriffen (8.1%).",
+  "gold": {
+   "v": 1,
+   "id": "reinigung-bern",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet die Endreinigung?",
+   "business": {
+    "name": "Reinigung Bern"
+   },
+   "fields": [
+    {
+     "id": "zimmer",
+     "type": "choice",
+     "label": "Wohnungsgrösse",
+     "options": [
+      {
+       "label": "1 Zimmer",
+       "value": 450
+      },
+      {
+       "label": "2 Zimmer",
+       "value": 650
+      },
+      {
+       "label": "3 Zimmer",
+       "value": 850
+      },
+      {
+       "label": "4 Zimmer",
+       "value": 1050
+      }
+     ],
+     "default": 0
+    },
+    {
+     "id": "balkon",
+     "type": "toggle",
+     "label": "Balkon",
+     "on": 50,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "zimmer + balkon",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "zimmer": 0
+   },
+   {
+    "zimmer": 2,
+    "balkon": true
+   },
+   {
+    "zimmer": 3
+   }
+  ]
+ },
+ {
+  "id": "de-garten-basel",
+  "lang": "de",
+  "text": "Gartenpflege Basel: 75 CHF pro Stunde und Gärtner, Grünabfuhr 40 CHF pro m³, Anfahrt 30 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "garten-basel",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet die Gartenpflege?",
+   "business": {
+    "name": "Gartenpflege Basel"
+   },
+   "fields": [
+    {
+     "id": "stunden",
+     "type": "number",
+     "label": "Stunden",
+     "unit": "h",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 3
+    },
+    {
+     "id": "gaertner",
+     "type": "number",
+     "label": "Anzahl Gärtner",
+     "min": 1,
+     "max": 5,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "id": "gruen",
+     "type": "number",
+     "label": "Grünabfuhr",
+     "unit": "m³",
+     "min": 0,
+     "max": 20,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "30 + stunden * gaertner * 75 + gruen * 40",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "stunden": 3
+   },
+   {
+    "stunden": 4,
+    "gaertner": 2,
+    "gruen": 2
+   },
+   {
+    "stunden": 1,
+    "gruen": 1
+   }
+  ]
+ },
+ {
+  "id": "de-fenster-luzern",
+  "lang": "de",
+  "ambiguous": true,
+  "note": "\"ab 8 CHF\" and \"etwas teurer\": the gold uses 8 CHF flat",
+  "text": "Fensterreinigung Luzern: ab 8 CHF pro Fenster, grosse Fenster etwas teurer, mindestens 120 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "fenster-luzern",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet die Fensterreinigung?",
+   "business": {
+    "name": "Fensterreinigung Luzern"
+   },
+   "fields": [
+    {
+     "id": "fenster",
+     "type": "number",
+     "label": "Anzahl Fenster",
+     "min": 1,
+     "max": 100,
+     "step": 1,
+     "default": 15
+    }
+   ],
+   "formula": "max(120, fenster * 8)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "fenster": 15
+   },
+   {
+    "fenster": 40
+   },
+   {
+    "fenster": 5
+   }
+  ]
+ },
+ {
+  "id": "de-velo-stgallen",
+  "lang": "de",
+  "text": "Velo-Service St. Gallen: Basis-Service 89 CHF, Komplett-Service 149 CHF, E-Bike-Zuschlag 30 CHF, Schlauch wechseln 25 CHF pro Rad.",
+  "gold": {
+   "v": 1,
+   "id": "velo-stgallen",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet der Velo-Service?",
+   "business": {
+    "name": "Velo-Service St. Gallen"
+   },
+   "fields": [
+    {
+     "id": "service",
+     "type": "choice",
+     "label": "Service",
+     "options": [
+      {
+       "label": "Basis-Service",
+       "value": 89
+      },
+      {
+       "label": "Komplett-Service",
+       "value": 149
+      }
+     ],
+     "default": 0
+    },
+    {
+     "id": "ebike",
+     "type": "toggle",
+     "label": "E-Bike",
+     "on": 30,
+     "off": 0,
+     "default": false
+    },
+    {
+     "id": "schlaeuche",
+     "type": "number",
+     "label": "Schläuche wechseln",
+     "min": 0,
+     "max": 2,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "service + ebike + schlaeuche * 25",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "service": 0
+   },
+   {
+    "service": 1,
+    "ebike": true,
+    "schlaeuche": 2
+   },
+   {
+    "service": 0,
+    "schlaeuche": 1
+   }
+  ]
+ },
+ {
+  "id": "de-catering-winterthur",
+  "lang": "de",
+  "text": "Catering Winterthur: 38 CHF pro Person, ab 50 Personen 10% Rabatt, Service-Personal 55 CHF pro Stunde, Lieferung 60 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "catering-winterthur",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet das Catering?",
+   "business": {
+    "name": "Catering Winterthur"
+   },
+   "fields": [
+    {
+     "id": "personen",
+     "type": "number",
+     "label": "Personen",
+     "min": 5,
+     "max": 500,
+     "step": 1,
+     "default": 30
+    },
+    {
+     "id": "stunden_service",
+     "type": "number",
+     "label": "Stunden Service-Personal",
+     "unit": "h",
+     "min": 0,
+     "max": 24,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "personen * 38 * if(personen >= 50, 0.9, 1) + stunden_service * 55 + 60",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "personen": 30
+   },
+   {
+    "personen": 80,
+    "stunden_service": 4
+   },
+   {
+    "personen": 50
+   }
+  ]
+ },
+ {
+  "id": "de-hundesitting-zug",
+  "lang": "de",
+  "text": "Hundesitting Zug: 45 CHF pro Tag, jeder weitere Hund 20 CHF pro Tag, Abholung 15 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "hundesitting-zug",
+   "locale": "de-CH",
+   "currency": "CHF",
+   "title": "Was kostet das Hundesitting?",
+   "business": {
+    "name": "Hundesitting Zug"
+   },
+   "fields": [
+    {
+     "id": "tage",
+     "type": "number",
+     "label": "Tage",
+     "min": 1,
+     "max": 60,
+     "step": 1,
+     "default": 3
+    },
+    {
+     "id": "weitere_hunde",
+     "type": "number",
+     "label": "Weitere Hunde",
+     "min": 0,
+     "max": 4,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "abholung",
+     "type": "toggle",
+     "label": "Abholung",
+     "on": 15,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "tage * (45 + weitere_hunde * 20) + abholung",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "tage": 3
+   },
+   {
+    "tage": 7,
+    "weitere_hunde": 1,
+    "abholung": true
+   },
+   {
+    "tage": 1
+   }
+  ]
+ },
+ {
+  "id": "fr-nettoyage-lausanne",
+  "lang": "fr",
+  "text": "Nettoyage de fin de bail à Lausanne : 6 CHF par m², 35 CHF par fenêtre, four et frigo 80 CHF forfait, minimum 250 CHF, TVA 8.1% comprise",
+  "gold": {
+   "v": 1,
+   "id": "nettoyage-lausanne",
+   "locale": "fr-CH",
+   "currency": "CHF",
+   "title": "Combien coûte le nettoyage de fin de bail ?",
+   "business": {
+    "name": "Nettoyage Lausanne"
+   },
+   "fields": [
+    {
+     "id": "surface",
+     "type": "number",
+     "label": "Surface",
+     "unit": "m²",
+     "min": 10,
+     "max": 500,
+     "step": 1,
+     "default": 70
+    },
+    {
+     "id": "fenetres",
+     "type": "number",
+     "label": "Nombre de fenêtres",
+     "min": 0,
+     "max": 50,
+     "step": 1,
+     "default": 4
+    },
+    {
+     "id": "four_frigo",
+     "type": "toggle",
+     "label": "Four et frigo",
+     "on": 80,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "max(250, surface * 6 + fenetres * 35 + four_frigo)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "surface": 70,
+    "fenetres": 4
+   },
+   {
+    "surface": 120,
+    "fenetres": 10,
+    "four_frigo": true
+   },
+   {
+    "surface": 20,
+    "fenetres": 0
+   }
+  ]
+ },
+ {
+  "id": "fr-demenagement-geneve",
+  "lang": "fr",
+  "ambiguous": true,
+  "note": "\"environ 40 à 50 CHF par m³\": the gold uses 40 with range 1.0-1.25",
+  "text": "Déménagement à Genève : environ 40 à 50 CHF par m³, 15 CHF par étage sans ascenseur, TVA 8.1% en sus.",
+  "gold": {
+   "v": 1,
+   "id": "demenagement-geneve",
+   "locale": "fr-CH",
+   "currency": "CHF",
+   "title": "Combien coûte votre déménagement ?",
+   "business": {
+    "name": "Déménagement Genève"
+   },
+   "fields": [
+    {
+     "id": "volume",
+     "type": "number",
+     "label": "Volume",
+     "unit": "m³",
+     "min": 1,
+     "max": 200,
+     "step": 1,
+     "default": 20
+    },
+    {
+     "id": "etages",
+     "type": "number",
+     "label": "Étages",
+     "min": 0,
+     "max": 20,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "sans_ascenseur",
+     "type": "toggle",
+     "label": "Sans ascenseur",
+     "on": 1,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "volume * 40 + etages * 15 * sans_ascenseur",
+   "range": {
+    "low": 1,
+    "high": 1.25
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "volume": 20
+   },
+   {
+    "volume": 30,
+    "etages": 3,
+    "sans_ascenseur": true
+   },
+   {
+    "volume": 8
+   }
+  ]
+ },
+ {
+  "id": "fr-peinture-fribourg",
+  "lang": "fr",
+  "text": "Peinture intérieure à Fribourg : 25 CHF par m², plafonds +30 %, déplacement 50 CHF, minimum 400 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "peinture-fribourg",
+   "locale": "fr-CH",
+   "currency": "CHF",
+   "title": "Combien coûte la peinture ?",
+   "business": {
+    "name": "Peinture Fribourg"
+   },
+   "fields": [
+    {
+     "id": "surface",
+     "type": "number",
+     "label": "Surface à peindre",
+     "unit": "m²",
+     "min": 1,
+     "max": 2000,
+     "step": 1,
+     "default": 60
+    },
+    {
+     "id": "plafonds",
+     "type": "toggle",
+     "label": "Plafonds",
+     "on": 1.3,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "max(400, surface * 25 * plafonds + 50)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "surface": 60
+   },
+   {
+    "surface": 100,
+    "plafonds": true
+   },
+   {
+    "surface": 8
+   }
+  ]
+ },
+ {
+  "id": "fr-jardin-neuchatel",
+  "lang": "fr",
+  "text": "Entretien de jardin à Neuchâtel : tonte 0.50 CHF le m², taille de haie 8 CHF le mètre, évacuation des déchets verts 60 CHF forfait.",
+  "gold": {
+   "v": 1,
+   "id": "jardin-neuchatel",
+   "locale": "fr-CH",
+   "currency": "CHF",
+   "title": "Combien coûte l'entretien du jardin ?",
+   "business": {
+    "name": "Jardin Neuchâtel"
+   },
+   "fields": [
+    {
+     "id": "pelouse",
+     "type": "number",
+     "label": "Pelouse",
+     "unit": "m²",
+     "min": 0,
+     "max": 5000,
+     "step": 1,
+     "default": 300
+    },
+    {
+     "id": "haie",
+     "type": "number",
+     "label": "Haie",
+     "unit": "m",
+     "min": 0,
+     "max": 500,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "evacuation",
+     "type": "toggle",
+     "label": "Évacuation des déchets verts",
+     "on": 60,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "pelouse * 0.5 + haie * 8 + evacuation",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "pelouse": 300
+   },
+   {
+    "pelouse": 600,
+    "haie": 30,
+    "evacuation": true
+   },
+   {
+    "pelouse": 100,
+    "haie": 10
+   }
+  ]
+ },
+ {
+  "id": "fr-plombier-sion",
+  "lang": "fr",
+  "text": "Plombier à Sion : 110 CHF de l'heure, déplacement 60 CHF, intervention le soir ou le week-end +50 %, TVA 8.1 % comprise.",
+  "gold": {
+   "v": 1,
+   "id": "plombier-sion",
+   "locale": "fr-CH",
+   "currency": "CHF",
+   "title": "Combien coûte le plombier ?",
+   "business": {
+    "name": "Plombier Sion"
+   },
+   "fields": [
+    {
+     "id": "heures",
+     "type": "number",
+     "label": "Heures",
+     "unit": "h",
+     "min": 1,
+     "max": 24,
+     "step": 1,
+     "default": 2
+    },
+    {
+     "id": "urgence",
+     "type": "toggle",
+     "label": "Soir ou week-end",
+     "on": 1.5,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "(60 + heures * 110) * urgence",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "heures": 2
+   },
+   {
+    "heures": 3,
+    "urgence": true
+   },
+   {
+    "heures": 1
+   }
+  ]
+ },
+ {
+  "id": "fr-guitare-vevey",
+  "lang": "fr",
+  "text": "Cours de guitare à Vevey : 80 CHF le cours de 60 minutes, 50 CHF le cours de 30 minutes, cours à domicile +20 CHF.",
+  "gold": {
+   "v": 1,
+   "id": "guitare-vevey",
+   "locale": "fr-CH",
+   "currency": "CHF",
+   "title": "Combien coûtent les cours de guitare ?",
+   "business": {
+    "name": "Cours de guitare Vevey"
+   },
+   "fields": [
+    {
+     "id": "duree",
+     "type": "choice",
+     "label": "Durée du cours",
+     "options": [
+      {
+       "label": "60 minutes",
+       "value": 80
+      },
+      {
+       "label": "30 minutes",
+       "value": 50
+      }
+     ],
+     "default": 0
+    },
+    {
+     "id": "cours",
+     "type": "number",
+     "label": "Nombre de cours",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "id": "domicile",
+     "type": "toggle",
+     "label": "À domicile",
+     "on": 20,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "cours * (duree + domicile)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "duree": 0,
+    "cours": 1
+   },
+   {
+    "duree": 1,
+    "cours": 10,
+    "domicile": true
+   },
+   {
+    "duree": 0,
+    "cours": 4,
+    "domicile": true
+   }
+  ]
+ },
+ {
+  "id": "en-cleaning-zurich",
+  "lang": "en",
+  "text": "End-of-tenancy cleaning in Zurich: CHF 12 per m², oven and fridge CHF 90 flat, balcony CHF 60, minimum CHF 500, VAT 8.1% included.",
+  "gold": {
+   "v": 1,
+   "id": "cleaning-zurich",
+   "locale": "en-CH",
+   "currency": "CHF",
+   "title": "How much is end-of-tenancy cleaning?",
+   "business": {
+    "name": "Cleaning Zurich"
+   },
+   "fields": [
+    {
+     "id": "area",
+     "type": "number",
+     "label": "Floor area",
+     "unit": "m²",
+     "min": 10,
+     "max": 500,
+     "step": 1,
+     "default": 60
+    },
+    {
+     "id": "oven_fridge",
+     "type": "toggle",
+     "label": "Oven and fridge",
+     "on": 90,
+     "off": 0,
+     "default": false
+    },
+    {
+     "id": "balcony",
+     "type": "toggle",
+     "label": "Balcony",
+     "on": 60,
+     "off": 0,
+     "default": false
+    }
+   ],
+   "formula": "max(500, area * 12 + oven_fridge + balcony)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": true,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "area": 60
+   },
+   {
+    "area": 110,
+    "oven_fridge": true,
+    "balcony": true
+   },
+   {
+    "area": 20
+   }
+  ]
+ },
+ {
+  "id": "en-painting-milan",
+  "lang": "en",
+  "text": "House painting in Milan: €9 per m² of wall, ceilings +15%, minimum €300, VAT 22% excluded.",
+  "gold": {
+   "v": 1,
+   "id": "painting-milan",
+   "locale": "en-IE",
+   "currency": "EUR",
+   "title": "How much does painting cost?",
+   "business": {
+    "name": "Painting Milan"
+   },
+   "fields": [
+    {
+     "id": "wall_area",
+     "type": "number",
+     "label": "Wall area",
+     "unit": "m²",
+     "min": 1,
+     "max": 2000,
+     "step": 1,
+     "default": 100
+    },
+    {
+     "id": "ceilings",
+     "type": "toggle",
+     "label": "Ceilings",
+     "on": 1.15,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "max(300, wall_area * 9 * ceilings)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "wall_area": 100
+   },
+   {
+    "wall_area": 200,
+    "ceilings": true
+   },
+   {
+    "wall_area": 20
+   }
+  ]
+ },
+ {
+  "id": "en-moving-geneva",
+  "lang": "en",
+  "text": "Moving in Geneva: CHF 120 per hour for a van with 2 movers, each extra mover CHF 45 per hour, minimum 3 hours.",
+  "gold": {
+   "v": 1,
+   "id": "moving-geneva",
+   "locale": "en-CH",
+   "currency": "CHF",
+   "title": "How much does your move cost?",
+   "business": {
+    "name": "Moving Geneva"
+   },
+   "fields": [
+    {
+     "id": "hours",
+     "type": "number",
+     "label": "Hours",
+     "unit": "h",
+     "min": 1,
+     "max": 24,
+     "step": 1,
+     "default": 4
+    },
+    {
+     "id": "extra_movers",
+     "type": "number",
+     "label": "Extra movers",
+     "min": 0,
+     "max": 6,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "max(3, hours) * (120 + extra_movers * 45)",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "hours": 4
+   },
+   {
+    "hours": 6,
+    "extra_movers": 2
+   },
+   {
+    "hours": 2
+   }
+  ]
+ },
+ {
+  "id": "en-dog-walking",
+  "lang": "en",
+  "ambiguous": true,
+  "note": "no currency and \"cheaper if you book weekly\" has no number: the gold uses EUR (prompt default) and ignores the discount",
+  "text": "Dog walking: 20 per walk, cheaper if you book weekly.",
+  "gold": {
+   "v": 1,
+   "id": "dog-walking",
+   "locale": "en-IE",
+   "currency": "EUR",
+   "title": "How much is dog walking?",
+   "business": {
+    "name": "Dog walking"
+   },
+   "fields": [
+    {
+     "id": "walks",
+     "type": "number",
+     "label": "Number of walks",
+     "min": 1,
+     "max": 60,
+     "step": 1,
+     "default": 5
+    }
+   ],
+   "formula": "walks * 20",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "walks": 5
+   },
+   {
+    "walks": 1
+   },
+   {
+    "walks": 20
+   }
+  ]
+ },
+ {
+  "id": "en-tutoring-online",
+  "lang": "en",
+  "text": "Online English tutoring: 35 euros per hour, each extra student +15 euros per hour, 10-hour package 10% off.",
+  "gold": {
+   "v": 1,
+   "id": "tutoring-online",
+   "locale": "en-IE",
+   "currency": "EUR",
+   "title": "How much is tutoring?",
+   "business": {
+    "name": "Online English tutoring"
+   },
+   "fields": [
+    {
+     "id": "hours",
+     "type": "number",
+     "label": "Hours",
+     "unit": "h",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "id": "extra_students",
+     "type": "number",
+     "label": "Extra students",
+     "min": 0,
+     "max": 5,
+     "step": 1,
+     "default": 0
+    },
+    {
+     "id": "package",
+     "type": "toggle",
+     "label": "10-hour package",
+     "on": 0.9,
+     "off": 1,
+     "default": false
+    }
+   ],
+   "formula": "hours * (35 + extra_students * 15) * package",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "branding": true
+  },
+  "inputs": [
+   {
+    "hours": 1
+   },
+   {
+    "hours": 10,
+    "extra_students": 1,
+    "package": true
+   },
+   {
+    "hours": 3,
+    "extra_students": 2
+   }
+  ]
+ },
+ {
+  "id": "en-garden-basel",
+  "lang": "en",
+  "text": "Garden maintenance in Basel: CHF 70 per hour, green waste disposal CHF 35 per bag, travel CHF 25, VAT 8.1% on top.",
+  "gold": {
+   "v": 1,
+   "id": "garden-basel",
+   "locale": "en-CH",
+   "currency": "CHF",
+   "title": "How much is garden maintenance?",
+   "business": {
+    "name": "Garden maintenance Basel"
+   },
+   "fields": [
+    {
+     "id": "hours",
+     "type": "number",
+     "label": "Hours",
+     "unit": "h",
+     "min": 1,
+     "max": 40,
+     "step": 1,
+     "default": 3
+    },
+    {
+     "id": "bags",
+     "type": "number",
+     "label": "Green waste bags",
+     "min": 0,
+     "max": 30,
+     "step": 1,
+     "default": 0
+    }
+   ],
+   "formula": "25 + hours * 70 + bags * 35",
+   "range": {
+    "low": 0.9,
+    "high": 1.1
+   },
+   "rounding": 10,
+   "vat": {
+    "rate": 8.1,
+    "pricesInclude": false,
+    "show": true
+   },
+   "branding": true
+  },
+  "inputs": [
+   {
+    "hours": 3
+   },
+   {
+    "hours": 6,
+    "bags": 4
+   },
+   {
+    "hours": 1,
+    "bags": 1
+   }
+  ]
+ }
+]

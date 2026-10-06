@@ -16,7 +16,8 @@
     "sim": "node --import tsx sim/run.ts all",
     "sim:d003": "node --import tsx sim/run.ts d003",
     "sim:d004": "node --import tsx sim/d004.ts",
-    "cli": "bun packages/cli/index.ts"
+    "cli": "bun packages/cli/index.ts",
+    "eval:aperto": "bun packages/aperto/eval/run.ts"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^12.0.0",

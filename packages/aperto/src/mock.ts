@@ -2,31 +2,23 @@
 // Config requests are matched on the owner's text (case/whitespace-insensitive) against
 // fixtures/recorded-demo.json and the eval's recorded-dry.json ("dry-70b" profile). Unknown
 // text -> HTTP 404 (code mock_no_recording). Message requests get a fixed per-language wording.
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { CONFIG_MARKER, MESSAGE_MARKER } from "./prompt.ts";
 import type { FetchLike, Lang, Usage } from "./types.ts";
+// Static JSON imports (not fs reads) so a bundled serverless function carries the recordings.
+import demo from "../fixtures/recorded-demo.json" with { type: "json" };
+import dry from "../eval/fixtures/recorded-dry.json" with { type: "json" };
+import cases from "../eval/fixtures/pricelists.json" with { type: "json" };
 
 type Recording = { responses: string[]; usage?: Usage[]; latencyMs?: number[] };
-const PKG = fileURLToPath(new URL("../", import.meta.url));
 export const normText = (s: string) => s.normalize("NFC").toLowerCase().replace(/\s+/g, " ").replace(/[\s.!]+$/, "").trim();
 
 let cache: Map<string, Recording> | null = null;
 function recordings(): Map<string, Recording> {
   if (cache) return cache;
   const map = new Map<string, Recording>();
-  const demoFile = join(PKG, "fixtures", "recorded-demo.json");
-  if (existsSync(demoFile)) for (const r of JSON.parse(readFileSync(demoFile, "utf8"))) map.set(normText(r.text), r);
-  const dryFile = join(PKG, "eval", "fixtures", "recorded-dry.json");
-  const casesFile = join(PKG, "eval", "fixtures", "pricelists.json");
-  if (existsSync(dryFile) && existsSync(casesFile)) {
-    const dry = JSON.parse(readFileSync(dryFile, "utf8"));
-    for (const c of JSON.parse(readFileSync(casesFile, "utf8"))) {
-      const r = dry.profiles?.["dry-70b"]?.[c.id];
-      if (r && !map.has(normText(c.text))) map.set(normText(c.text), r);
-    }
-  }
+  for (const r of demo as { text: string }[]) map.set(normText(r.text), r as unknown as Recording);
+  const big = (dry as { profiles: Record<string, Record<string, Recording>> }).profiles["dry-70b"] ?? {};
+  for (const c of cases as { id: string; text: string }[]) if (big[c.id] && !map.has(normText(c.text))) map.set(normText(c.text), big[c.id]);
   return (cache = map);
 }
 

@@ -2,7 +2,7 @@
 // Core-formatted amounts are filled in afterwards. Any digit, unknown placeholder or link in the
 // wording is rejected (one repair), then a per-language template is used. The model never sees
 // the amounts, so it cannot alter them.
-import type { Config, Quote } from "../../core/src/index.ts";
+import { formatMoney, formatNumber, type Config, type Quote } from "../../core/src/index.ts";
 import { clientFromEnv } from "./client.ts";
 import { messageMessages, messageRepair } from "./prompt.ts";
 import { LANGS, type ApiError, type AttemptTrace, type ChatClient, type ChatMessage, type DraftResult, type Lang } from "./types.ts";
@@ -16,9 +16,6 @@ export const MAX_WORDING = 600;
 /** Currency names/symbols: the wording never needs them (amounts come from placeholders), so they catch amounts written in words ("mille francs"). */
 const CURRENCY_WORDS = /[€$£]|\b(?:chf|eur|euros?|usd|franken|franchi|franco|francs?|fr\.|rappen|centesimi|centimes?|cents?|dollars?)(?![\p{L}])/iu;
 
-function fmt(locale: string, opts: Intl.NumberFormatOptions): Intl.NumberFormat {
-  try { return new Intl.NumberFormat(locale, opts); } catch { return new Intl.NumberFormat("en", opts); }
-}
 const centsOk = (n: unknown): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n <= 1e13;
 /** Same rounding as core computeQuote (design 10.1). */
 const gross = (cents: number, rate: number, include: boolean) => (include ? cents : Math.round(Math.round((cents * (100 + rate)) / 100 * 1e6) / 1e6));
@@ -33,16 +30,15 @@ export function quoteAmounts(config: Config, quote: unknown): { ok: true; amount
   if (!errors.length && (q.lowCents as number) > (q.highCents as number)) errors.push({ path: "quote.highCents", message: "must be >= lowCents" });
   if (errors.length) return { ok: false, errors };
   const vat = config.vat ?? { rate: 0, pricesInclude: true, show: false };
-  const money = fmt(config.locale, { style: "currency", currency: config.currency });
-  const plain = fmt(config.locale, { maximumFractionDigits: 2 });
-  const m = (c: number) => money.format(c / 100).replace(SPACES, " ");
+  // core formatMoney: the same string the widget shows (runtime-stable Swiss grouping), NBSP -> space as in buildLeadMessage.
+  const m = (c: number) => formatMoney(c, config.currency, config.locale).replace(SPACES, " ");
   const low = q.lowCents as number, high = q.highCents as number;
   return {
     ok: true,
     amounts: {
       low: m(low), high: m(high),
       lowGross: m(gross(low, vat.rate, vat.pricesInclude)), highGross: m(gross(high, vat.rate, vat.pricesInclude)),
-      rate: plain.format(vat.rate).replace(SPACES, " "), pricesInclude: vat.pricesInclude, showVat: vat.show,
+      rate: formatNumber(vat.rate, config.locale).replace(SPACES, " "), pricesInclude: vat.pricesInclude, showVat: vat.show,
     },
   };
 }

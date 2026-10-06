@@ -67,6 +67,34 @@ function fmt(locale: string, opts: Intl.NumberFormatOptions): Intl.NumberFormat 
   return f;
 }
 
+/** Swiss grouping separator. ICU versions disagree (U+0027 in Bun/JSC, U+2019 or U+202F in V8/Node),
+ *  so every *-CH locale gets U+2019 explicitly. Other locales print the same on every runtime we test. */
+export const SWISS_GROUP = "\u2019";
+const regionCache = new Map<string, boolean>();
+function isSwiss(locale: string): boolean {
+  let v = regionCache.get(locale);
+  if (v === undefined) {
+    try { v = new Intl.Locale(locale).region === "CH"; } catch { v = /-CH(?:-|$)/i.test(locale); }
+    regionCache.set(locale, v);
+  }
+  return v;
+}
+function render(f: Intl.NumberFormat, value: number, locale: string): string {
+  if (!isSwiss(locale)) return f.format(value);
+  return f.formatToParts(value).map((p) => (p.type === "group" ? SWISS_GROUP : p.value)).join("");
+}
+
+/** THE money formatter (design 10.2 "Intl.NumberFormat(locale, currency)"), runtime-stable. Used by
+ *  computeQuote (widget, builder, /q), buildLeadMessage (via quote.display) and @quotelet/aperto. */
+export function formatMoney(cents: number, currency: string, locale: string): string {
+  return render(fmt(locale, { style: "currency", currency }), cents / 100, locale);
+}
+
+/** Plain number (answers, VAT rate) with the same runtime-stable grouping. */
+export function formatNumber(value: number, locale: string): string {
+  return render(fmt(locale, { maximumFractionDigits: 2 }), value, locale);
+}
+
 export function computeQuote(config: Config, answers: Answers): Quote {
   const ans = normalizeAnswers(config, answers);
   const c = getCompiled(config);
@@ -85,21 +113,20 @@ export function computeQuote(config: Config, answers: Answers): Quote {
   const lowGrossCents = gross(lowCents), highGrossCents = gross(highCents);
 
   const t = strings(config.locale);
-  const money = fmt(config.locale, { style: "currency", currency: config.currency });
-  const plain = fmt(config.locale, { maximumFractionDigits: 2 });
-  const rate = plain.format(vat.rate);
+  const money = (cents: number) => formatMoney(cents, config.currency, config.locale);
+  const rate = formatNumber(vat.rate, config.locale);
   const vatNote = !vat.show ? "" : vat.pricesInclude ? t.vatIncluded(rate) : t.vatExcluded(rate);
 
   return {
     pointCents, lowCents, highCents, currency: config.currency,
     vat: { rate: vat.rate, pricesInclude: vat.pricesInclude, lowGrossCents, highGrossCents },
     display: {
-      low: money.format(lowCents / 100), high: money.format(highCents / 100), vatNote,
-      lowGross: money.format(lowGrossCents / 100), highGross: money.format(highGrossCents / 100),
+      low: money(lowCents), high: money(highCents), vatNote,
+      lowGross: money(lowGrossCents), highGross: money(highGrossCents),
     },
     answers: config.fields.map((f) => {
       const a = ans[f.id];
-      const display = f.type === "number" ? plain.format(a as number) + (f.unit ? ` ${f.unit}` : "")
+      const display = f.type === "number" ? formatNumber(a as number, config.locale) + (f.unit ? ` ${f.unit}` : "")
         : f.type === "choice" ? f.options[a as number].label : a ? t.yes : t.no;
       return { id: f.id, label: f.label, display };
     }),

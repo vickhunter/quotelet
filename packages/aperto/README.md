@@ -43,7 +43,7 @@ Types: `packages/aperto/src/types.ts` (`ConfigRequest`, `ConfigResponse`, `Messa
 // 400 failure (bad config/quote)
 { "ok": false, "errors": [ { "path": "config.formula", "message": "..." } ] }
 ```
-- The server re-validates `config` with `validateConfig`. It reads only the cents in `quote` (`lowCents`, `highCents`, `vat.lowGrossCents`, `vat.highGrossCents`, `vat.rate`, `vat.pricesInclude`) and re-formats them exactly like `computeQuote` (`Intl.NumberFormat(config.locale, {style:"currency"})`, NBSP normalised to spaces as in `buildLeadMessage`). Client `display` strings are ignored.
+- The server re-validates `config` with `validateConfig`. It reads only the cents in `quote` (`lowCents`, `highCents`, `vat.lowGrossCents`, `vat.highGrossCents`, `vat.rate`, `vat.pricesInclude`) and re-formats them with core `formatMoney` (the same function behind `computeQuote` and the widget; Swiss grouping is always U+2019 on every runtime; NBSP normalised to spaces as in `buildLeadMessage`). Client `display` strings are ignored.
 - The model must return wording containing `{LOW}` and `{HIGH}`, plus `{VAT}` when the config shows VAT. `{BUSINESS}` is optional. Any digit, any other `{…}` placeholder, any link, or more than 600 chars means rejection. After one repair retry, the server falls back to a fixed template in the requested language (`source:"template"`). If the model is down or not configured, the template is used straight away. So `message` returns `ok:false` only for a bad request.
 - `{VAT}` becomes e.g. "IVA 8.1% inclusa." (prices include VAT) or "IVA 22% esclusa; con IVA: 1.293,20 € – 1.744,60 €." (prices exclude VAT, gross range from core cents).
 

@@ -3,7 +3,7 @@ export { validateConfig } from "./schema.ts";
 export type { ValidateResult } from "./schema.ts";
 export { compileFormula } from "./formula.ts";
 export type { CompileResult, CompiledFormula, FormulaError, EvalResult } from "./formula.ts";
-export { defaultAnswers, computeQuote, normalizeAnswers } from "./quote.ts";
+export { defaultAnswers, computeQuote, normalizeAnswers, formatMoney, formatNumber, SWISS_GROUP } from "./quote.ts";
 export { buildWhatsAppUrl, buildMailtoUrl, buildLeadMessage } from "./handoff.ts";
 export { encodeConfig, decodeConfig } from "./encode.ts";
 export type { DecodeResult } from "./encode.ts";

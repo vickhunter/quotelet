@@ -119,7 +119,7 @@ export async function draftMessage(config: Config, quote: Quote, lang: Lang, opt
     }
     const w = cleanWording(content);
     const problems = checkWording(w, { needVat });
-    if (!problems.length) return { ok: true, text: fill(w, a, L, business), source: "model", attempts: attempt, errors, trace };
+    if (!problems.length) return { ok: true, text: fill(w, a, L, business), source: client.recorded ? "recording" : "model", attempts: attempt, errors, trace };
     trace[trace.length - 1].errors = problems;
     errors.push(...problems);
     if (attempt < 2) messages.push({ role: "assistant", content: content.slice(0, 2000) }, messageRepair(problems));

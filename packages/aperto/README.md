@@ -23,11 +23,12 @@ Types: `packages/aperto/src/types.ts` (`ConfigRequest`, `ConfigResponse`, `Messa
 // request
 { "action": "config", "text": "Umzug: 45 CHF pro m³, +20 CHF pro Stockwerk ohne Lift, mindestens 300 CHF, MwSt 8.1% inklusive", "lang": "de" }   // lang: "it" | "de" | "fr" | "en"
 // 200 success
-{ "ok": true, "config": { "v": 1, "id": "umzug-lugano", "locale": "de-CH", "currency": "CHF", "...": "validated config v1" }, "attempts": 1, "warnings": [ { "path": "formula", "message": "..." } ] }
+{ "ok": true, "config": { "v": 1, "id": "umzug-lugano", "locale": "de-CH", "currency": "CHF", "...": "validated config v1" }, "attempts": 1, "warnings": [ { "path": "formula", "message": "..." } ], "source": "model" }   // or "recording"
 // 200 failure (model answered, validator rejected it twice)
 { "ok": false, "errors": [ { "path": "fields[1].on", "message": "must be a number" }, { "path": "text", "message": "Add a concrete number ..." } ], "attempts": 2 }
 ```
 - `attempts` is the number of model calls: 1, or 2 after the single repair retry. It is 0 when the request was rejected before any model call.
+- `source` (additive, optional): `"model"` for a live model answer, `"recording"` when `APERTUS_MOCK=1` replayed a recorded answer, so the UI can label demo configs honestly.
 - `config` is the normalised output of `validateConfig`, so it can go straight into `encodeConfig` / `/q#c=…`.
 - `warnings` come from core (for example division by zero with the defaults) plus Aperto's own checks:
   - `business.whatsapp` / `business.email` are dropped when they do not appear in the owner's text (stops prompt injection and hallucinated contacts from routing leads elsewhere).
@@ -39,12 +40,12 @@ Types: `packages/aperto/src/types.ts` (`ConfigRequest`, `ConfigResponse`, `Messa
 // request: quote = computeQuote(config, answers) from @quotelet/core
 { "action": "message", "config": { "v": 1, "...": "..." }, "quote": { "lowCents": 86000, "highCents": 106000, "vat": { "...": "..." }, "...": "..." }, "lang": "it" }
 // 200 success
-{ "ok": true, "text": "Buongiorno! La stima è tra CHF 860.00 e CHF 1’060.00. IVA 8.1% inclusa.", "source": "model" }   // or "template"
+{ "ok": true, "text": "Buongiorno! La stima è tra CHF 860.00 e CHF 1’060.00. IVA 8.1% inclusa.", "source": "model" }   // or "recording" | "template"
 // 400 failure (bad config/quote)
 { "ok": false, "errors": [ { "path": "config.formula", "message": "..." } ] }
 ```
 - The server re-validates `config` with `validateConfig`. It reads only the cents in `quote` (`lowCents`, `highCents`, `vat.lowGrossCents`, `vat.highGrossCents`, `vat.rate`, `vat.pricesInclude`) and re-formats them with core `formatMoney` (the same function behind `computeQuote` and the widget; Swiss grouping is always U+2019 on every runtime; NBSP normalised to spaces as in `buildLeadMessage`). Client `display` strings are ignored.
-- The model must return wording containing `{LOW}` and `{HIGH}`, plus `{VAT}` when the config shows VAT. `{BUSINESS}` is optional. Any digit, any other `{…}` placeholder, any link, or more than 600 chars means rejection. After one repair retry, the server falls back to a fixed template in the requested language (`source:"template"`). If the model is down or not configured, the template is used straight away. So `message` returns `ok:false` only for a bad request.
+- The model must return wording containing `{LOW}` and `{HIGH}`, plus `{VAT}` when the config shows VAT. `{BUSINESS}` is optional. Any digit, any other `{…}` placeholder, any link, or more than 600 chars means rejection. After one repair retry, the server falls back to a fixed template in the requested language (`source:"template"`). If the model is down or not configured, the template is used straight away. `source` is `"model"` for live wording, `"recording"` for wording replayed by `APERTUS_MOCK=1`, and `"template"` for the fallback in any mode (mock included). So `message` returns `ok:false` only for a bad request.
 - `{VAT}` becomes e.g. "IVA 8.1% inclusa." (prices include VAT) or "IVA 22% esclusa; con IVA: 1.293,20 € – 1.744,60 €." (prices exclude VAT, gross range from core cents).
 
 ### Request-level errors (both actions)

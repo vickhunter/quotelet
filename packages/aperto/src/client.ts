@@ -16,6 +16,7 @@ export function createClient(opts: ClientOptions): ChatClient {
   const timeoutMs = opts.timeoutMs ?? 20000;
   return {
     model: opts.model,
+    recorded: opts.recorded === true,
     async chat(messages: ChatMessage[], o = {}): Promise<ChatResult> {
       const headers: Record<string, string> = { "content-type": "application/json", accept: "application/json", "user-agent": "quotelet-aperto/0.1 (+https://github.com/vickhunter/quotelet)" }; // some gateways (Public AI) require a User-Agent
       if (opts.apiKey) headers.authorization = `Bearer ${opts.apiKey}`;
@@ -56,6 +57,6 @@ export function createClient(opts: ClientOptions): ChatClient {
 export function clientFromEnv(env: Env = process.env, fetchImpl?: FetchLike, model?: string): ChatClient | null {
   const e = readApertusEnv(env);
   if (e.configured) return createClient({ baseUrl: e.baseUrl, model: model ?? e.model, apiKey: e.apiKey, fetch: fetchImpl, timeoutMs: e.timeoutMs });
-  if (e.mock) return createClient({ baseUrl: "http://mock.invalid/v1", model: model ?? "apertus-mock", fetch: createMockFetch() });
+  if (e.mock) return createClient({ baseUrl: "http://mock.invalid/v1", model: model ?? "apertus-mock", fetch: createMockFetch(), recorded: true });
   return null;
 }

@@ -10,7 +10,9 @@ export type ApiError = ValidationError; // { path: string; message: string }
 
 // ---- action "config" -------------------------------------------------------------------------
 export type ConfigRequest = { action: "config"; text: string; lang: Lang };
-export type ConfigSuccess = { ok: true; config: Config; attempts: number; warnings: ApiError[] };
+/** `source` (additive, optional for older clients): "recording" when APERTUS_MOCK=1 replayed a recorded answer. */
+export type ConfigSource = "model" | "recording";
+export type ConfigSuccess = { ok: true; config: Config; attempts: number; warnings: ApiError[]; source?: ConfigSource };
 export type ConfigFailure = { ok: false; errors: ApiError[]; attempts: number };
 export type ConfigResponse = ConfigSuccess | ConfigFailure;
 
@@ -19,7 +21,9 @@ export type ConfigResponse = ConfigSuccess | ConfigFailure;
  *  (lowCents, highCents, vat.*) and re-formats every amount with core's Intl formatting; client
  *  display strings are ignored, so the text can only carry core-formatted amounts. */
 export type MessageRequest = { action: "message"; config: Config; quote: Quote; lang: Lang };
-export type MessageSuccess = { ok: true; text: string; source: "model" | "template" };
+/** "model": live model wording; "recording": APERTUS_MOCK=1 replayed wording; "template": built-in fallback (any mode). */
+export type MessageSource = "model" | "template" | "recording";
+export type MessageSuccess = { ok: true; text: string; source: MessageSource };
 export type MessageFailure = { ok: false; errors: ApiError[] };
 export type MessageResponse = MessageSuccess | MessageFailure;
 
@@ -46,9 +50,11 @@ export type ChatResult = { content: string; usage: Usage; latencyMs: number; mod
 /** fetch-compatible transport, injectable so tests and the mock never touch the network. */
 export type FetchLike = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<Response>;
 
-export type ClientOptions = { baseUrl: string; model: string; apiKey?: string; fetch?: FetchLike; timeoutMs?: number; maxTokens?: number };
+export type ClientOptions = { baseUrl: string; model: string; apiKey?: string; fetch?: FetchLike; timeoutMs?: number; maxTokens?: number; /** answers are replayed recordings (APERTUS_MOCK) */ recorded?: boolean };
 export interface ChatClient {
   readonly model: string;
+  /** true when answers are replayed recordings (APERTUS_MOCK=1), so results are labelled "recording", not "model". */
+  readonly recorded?: boolean;
   chat(messages: ChatMessage[], opts?: { temperature?: number; maxTokens?: number; json?: boolean }): Promise<ChatResult>;
 }
 

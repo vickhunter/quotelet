@@ -119,7 +119,7 @@ export function createApertoHandler(opts: HandlerOptions = {}): (req: Request) =
         if (text.length > PROXY_LIMITS.maxTextChars) return fail(400, [{ path: "text", message: `must be at most ${PROXY_LIMITS.maxTextChars} characters` }], action);
         if (!client) return fail(503, [{ path: "model", message: "No model configured on the server (APERTUS_BASE_URL + APERTUS_MODEL, or APERTUS_MOCK=1)" }], action);
         const r = await generateConfig(text, lang, { client });
-        const out: ConfigResponse = r.ok ? { ok: true, config: r.config, attempts: r.attempts, warnings: r.warnings } : { ok: false, errors: r.errors, attempts: r.attempts };
+        const out: ConfigResponse = r.ok ? { ok: true, config: r.config, attempts: r.attempts, warnings: r.warnings, ...(r.source ? { source: r.source } : {}) } : { ok: false, errors: r.errors, attempts: r.attempts };
         return json(scrub(out, env));
       }
 

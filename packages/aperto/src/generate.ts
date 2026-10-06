@@ -115,7 +115,7 @@ export async function generateConfig(text: string, lang: Lang, opts: GenerateOpt
       return { ok: false, errors: [{ path: "model", message }], attempts: attempt, trace };
     }
     const c = check(content, text);
-    if (c.ok) return { ok: true, config: c.config, attempts: attempt, warnings: c.warnings, trace };
+    if (c.ok) return { ok: true, config: c.config, attempts: attempt, warnings: c.warnings, source: client.recorded ? "recording" : "model", trace };
     lastErrors = c.errors;
     trace[trace.length - 1].errors = c.errors;
     if (attempt < max) messages.push({ role: "assistant", content: content.slice(0, 6000) }, repairMessage(c.errors));

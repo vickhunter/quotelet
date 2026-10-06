@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { computeQuote } from '@quotelet/core'
 import type { Config } from '@quotelet/core/types'
 import {
-  APERTO_DRAFT_KEY, APERTO_EXAMPLES, langOfLocale, leadText, loadApertoDraft, messageKey, requestConfig, requestMessage,
+  APERTO_DRAFT_KEY, APERTO_EXAMPLES, isRecording, langOfLocale, leadText, loadApertoDraft, messageKey, requestConfig, requestMessage,
   saveApertoDraft, summarizeConfig, waUrl,
 } from './aperto'
 
@@ -148,5 +148,30 @@ describe('langOfLocale', () => {
     expect(langOfLocale('it-IT')).toBe('it')
     expect(langOfLocale('en-IE')).toBe('en')
     expect(langOfLocale('es-ES')).toBe('en')
+  })
+})
+
+describe('demo label (mock mode)', () => {
+  test('a config answer with source "recording" is a demo; "model" or no source is live', async () => {
+    const rec = await requestConfig('x 1', 'de', { fetch: fakeFetch(() => Response.json({ ok: true, config: mover, attempts: 1, warnings: [], source: 'recording' })).f })
+    expect(rec).toEqual({ ok: true, config: mover, attempts: 1, warnings: [], source: 'recording' })
+    expect(isRecording(rec)).toBe(true)
+    const live = await requestConfig('x 1', 'de', { fetch: fakeFetch(() => Response.json({ ok: true, config: mover, attempts: 1, warnings: [], source: 'model' })).f })
+    expect(isRecording(live)).toBe(false)
+    const old = await requestConfig('x 1', 'de', { fetch: fakeFetch(() => Response.json({ ok: true, config: mover, attempts: 1, warnings: [] })).f })
+    expect(isRecording(old)).toBe(false)
+    const odd = await requestConfig('x 1', 'de', { fetch: fakeFetch(() => Response.json({ ok: true, config: mover, attempts: 1, warnings: [], source: 'hacked' })).f })
+    expect(odd).toEqual({ ok: true, config: mover, attempts: 1, warnings: [] })
+  })
+  test('a message answer with source "recording" is a demo; model and template are not', async () => {
+    const msg = (source?: string) => requestMessage(mover, quote, 'it', { fetch: fakeFetch(() => Response.json({ ok: true, text: 'Buongiorno', source })).f })
+    const rec = await msg('recording')
+    expect(rec).toEqual({ ok: true, text: 'Buongiorno', source: 'recording' })
+    expect(isRecording(rec)).toBe(true)
+    expect(isRecording(await msg('model'))).toBe(false)
+    expect(isRecording(await msg('template'))).toBe(false)
+    expect(isRecording(await msg())).toBe(false)
+    expect(isRecording(null)).toBe(false)
+    expect(isRecording({ ok: false, errors: [] })).toBe(false)
   })
 })

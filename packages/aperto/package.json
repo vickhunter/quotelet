@@ -1,0 +1,13 @@
+{
+  "name": "@quotelet/aperto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Quotelet Aperto: Apertus (OpenAI-compatible) turns a plain-language price list into a validated Quotelet config and writes the customer message. The LLM never computes prices.",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": { ".": "./src/index.ts", "./proxy": "./src/proxy.ts", "./types": "./src/types.ts" },
+  "scripts": { "eval": "bun eval/run.ts" },
+  "dependencies": { "@quotelet/core": "workspace:*" }
+}

@@ -46,10 +46,11 @@ export function createRateLimiter(perMinute: number, now: () => number = Date.no
 
 function clientIp(req: Request, trust: boolean): string {
   if (trust) {
-    const xff = req.headers.get("x-forwarded-for");
-    if (xff) return xff.split(",")[0].trim().slice(0, 64) || "unknown";
+    // Vercel sets x-real-ip / x-forwarded-for itself (client values are overwritten); prefer x-real-ip.
     const real = req.headers.get("x-real-ip");
     if (real) return real.trim().slice(0, 64);
+    const xff = req.headers.get("x-forwarded-for");
+    if (xff) return xff.split(",")[0].trim().slice(0, 64) || "unknown";
   }
   return "local";
 }

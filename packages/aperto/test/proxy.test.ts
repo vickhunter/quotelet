@@ -99,6 +99,7 @@ describe("POST /api/aperto proxy (Web Request -> Response)", () => {
     expect(good.status).toBe(200);
     expect(good.headers.get("access-control-allow-origin")).toBeNull();
     expect(good.headers.get("cache-control")).toBe("no-store");
+    expect((await h(post({ action: "config", text: mover.text, lang: "de" }, { origin: "null" }))).status).toBe(403);
   });
 
   test("per-IP token bucket: 10/min, 11th -> 429 with Retry-After; other IPs unaffected; refills", async () => {

@@ -2,7 +2,9 @@
 // braces inside strings, trailing commas. Returns the first balanced top-level object that parses.
 export type ExtractResult = { ok: true; value: Record<string, unknown> } | { ok: false; error: string };
 
-const MAX_INPUT = 64 * 1024;
+const MAX_INPUT = 32 * 1024;
+/** Bound the brace scan (an endpoint that ignores max_tokens could return pathological output). */
+const MAX_STARTS = 50;
 
 function tryParse(s: string): unknown {
   try { return JSON.parse(s); } catch { /* fall through */ }
@@ -12,7 +14,8 @@ const isObj = (x: unknown): x is Record<string, unknown> => x !== null && typeof
 
 /** Balanced `{...}` spans in order of appearance, string-aware. */
 function* objectSpans(s: string): Generator<string> {
-  for (let start = s.indexOf("{"); start !== -1; start = s.indexOf("{", start + 1)) {
+  let tries = 0;
+  for (let start = s.indexOf("{"); start !== -1 && tries++ < MAX_STARTS; start = s.indexOf("{", start + 1)) {
     let depth = 0, inStr = false, esc = false;
     for (let i = start; i < s.length; i++) {
       const ch = s[i];

@@ -13,6 +13,8 @@ export type Amounts = { low: string; high: string; lowGross: string; highGross: 
 const SPACES = /[\u00a0\u202f\u2007]/g;
 const PLACEHOLDERS = new Set(["LOW", "HIGH", "VAT", "BUSINESS"]);
 export const MAX_WORDING = 600;
+/** Currency names/symbols: the wording never needs them (amounts come from placeholders), so they catch amounts written in words ("mille francs"). */
+const CURRENCY_WORDS = /[€$£]|\b(?:chf|eur|euros?|usd|franken|franchi|franco|francs?|fr\.|rappen|centesimi|centimes?|cents?|dollars?)(?![\p{L}])/iu;
 
 function fmt(locale: string, opts: Intl.NumberFormatOptions): Intl.NumberFormat {
   try { return new Intl.NumberFormat(locale, opts); } catch { return new Intl.NumberFormat("en", opts); }
@@ -81,6 +83,8 @@ export function checkWording(w: string, opts: { needVat: boolean }): ApiError[] 
   for (const m of w.matchAll(/\{([^{}]*)\}/g)) if (!PLACEHOLDERS.has(m[1])) { err(`unknown placeholder {${m[1].slice(0, 20)}}`); break; }
   if (/[{}]/.test(w.replace(/\{(LOW|HIGH|VAT|BUSINESS)\}/g, ""))) err("stray braces");
   if (/\p{Nd}/u.test(w)) err("the message contains digits; amounts must only come from the placeholders");
+  if (/[<>]/.test(w)) err("the message contains markup characters (< or >)");
+  if (CURRENCY_WORDS.test(w)) err("the message names a currency or amount in words; amounts must only come from the placeholders");
   if (/https?:|www\.|\b[a-z0-9-]+\.(?:com|net|org|ch|it|de|fr|io|ly|me|app|xyz|info)\b|@/i.test(w)) err("the message contains a link or address");
   return e;
 }

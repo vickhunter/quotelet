@@ -83,6 +83,13 @@ describe("draftMessage: model writes wording only; core fills {LOW} {HIGH} {VAT}
     expect(checkWording("From {LOW} to {HIGH}, pay at https://evil.example", { needVat: false }).length).toBeGreaterThan(0); // links
     expect(checkWording("From {LOW} to {HIGH} " + "x".repeat(800), { needVat: false }).length).toBeGreaterThan(0); // too long
     expect(checkWording("Da {LOW} a {HIGH}, tre giorni", { needVat: false })).toEqual([]);
+    // amounts in words / currency names, and markup, are rejected too (review C2/C3)
+    expect(checkWording("From {LOW} to {HIGH}, or eight hundred francs cash", { needVat: false }).length).toBeGreaterThan(0);
+    expect(checkWording("Da {LOW} a {HIGH}, circa mille euro", { needVat: false }).length).toBeGreaterThan(0);
+    expect(checkWording("Von {LOW} bis {HIGH}, sonst achthundert Franken", { needVat: false }).length).toBeGreaterThan(0);
+    expect(checkWording("Entre {LOW} et {HIGH} €", { needVat: false }).length).toBeGreaterThan(0);
+    expect(checkWording("From {LOW} to {HIGH} <b>now</b>", { needVat: false }).length).toBeGreaterThan(0);
+    expect(checkWording("Bonjour {BUSINESS}, entre {LOW} et {HIGH}. Franchement merci !", { needVat: false })).toEqual([]);
   });
 
   test("templates exist for every language and pass the same rules", () => {

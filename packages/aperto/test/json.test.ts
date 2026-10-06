@@ -29,3 +29,10 @@ describe("extractJson (robust to fences and prose)", () => {
     expect(extractJson('{"a":[1,2,],}')).toEqual({ ok: true, value: { a: [1, 2] } });
   });
 });
+
+test("pathological brace soup is bounded (no quadratic blow-up)", () => {
+  const t0 = performance.now();
+  const r = extractJson("{".repeat(200000) + ' {"a":1}');
+  expect(performance.now() - t0).toBeLessThan(500);
+  expect(r.ok).toBe(false);
+});

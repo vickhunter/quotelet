@@ -1,4 +1,5 @@
 import type { Config, Field } from '@quotelet/core/types'
+import { t } from './i18n'
 
 export type BuilderState = {
   templateId: string
@@ -34,13 +35,23 @@ export const initBuilder = (): BuilderState => ({ templateId: '', config: EMPTY,
 
 export const normalizeWhatsapp = (raw: string) => raw.replace(/\D/g, '')
 
-export function whatsappProblem(raw: string): string | null {
+/** Dictionary keys whatsappProblemKey can return (see i18n.ts). */
+export const builderStrings = ['wa.digits', 'wa.short', 'wa.long'] as const
+export type WhatsappProblem = (typeof builderStrings)[number]
+
+export function whatsappProblemKey(raw: string): WhatsappProblem | null {
   if (!raw.trim()) return null
-  if (/[a-z]/i.test(raw)) return 'Use digits only, with the country code.'
+  if (/[a-z]/i.test(raw)) return 'wa.digits'
   const d = normalizeWhatsapp(raw)
-  if (d.length < 8) return 'Too short. Include the country code, e.g. +39.'
-  if (d.length > 15) return 'Too long for a phone number.'
+  if (d.length < 8) return 'wa.short'
+  if (d.length > 15) return 'wa.long'
   return null
+}
+
+/** English message, kept for callers outside the localized builder. */
+export function whatsappProblem(raw: string): string | null {
+  const k = whatsappProblemKey(raw)
+  return k ? t('en', k) : null
 }
 
 export const canShare = (s: BuilderState, { formulaOk }: { formulaOk: boolean }) =>

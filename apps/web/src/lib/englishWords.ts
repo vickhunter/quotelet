@@ -1,9 +1,10 @@
 // D-004c: English words that must never appear on the Italian builder or share page.
 // Built from every word in the EN dictionary, core formula errors and the widget's EN copy,
-// minus words Italian uses as-is (formula, email, link, WhatsApp, JSON, IVA, mq...).
+// minus words Italian uses as-is (formula, email, link, WhatsApp, JSON, IVA, mq...) and "it",
+// which is also the IT language code shown in pickers.
 // Short words that are also Italian (a, e, in, no, per, come, con...) are left out on purpose.
 export const ENGLISH_WORDS = new Set(
-  `the your you and with to of for from this that these those it its is are be been was were will can could
+  `the your you and with to of for from this that these those is are be been was were will can could
   should must not only too here there when what how much does do cost costs get got
   build built calculator calculators free account draft browser stays stay home main
   template templates business name names number numbers optional questions question price prices

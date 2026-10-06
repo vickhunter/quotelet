@@ -41,3 +41,10 @@
   .panel { padding: 16px; }
   .fe-row { grid-template-columns: 1fr 92px auto; }
 }
+
+/* D-004c: IT / EN switch in the builder header */
+.ui-lang { display: flex; }
+.ui-lang .seg-opt span { min-width: 44px; padding: 0 10px; font-size: 13px; }
+/* the WhatsApp hint/error sit inside .field: beat `.field > span` so the error is red and the hint quiet */
+.field > span.hint { font-weight: 400; font-size: 13px; color: var(--ink-3); }
+.field > span.error { font-weight: 500; color: var(--danger); }

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { Config, Quote } from '@quotelet/core/types'
+import { EN } from '../lib/i18n'
 
 type Handle = { update(answers: Record<string, number | boolean>): void; destroy(): void }
 type QuoteletApi = { mount(el: Element, config: unknown): Handle }
@@ -20,10 +21,12 @@ type Props = {
   testId?: string
   className?: string
   onQuote?: (q: Quote) => void
+  /** Shown if /quotelet.js never loads. */
+  loadError?: string
 }
 
 /** Mounts the real embeddable widget. Remounts when the config changes. */
-export function QuoteWidget({ config, testId, className, onQuote }: Props) {
+export function QuoteWidget({ config, testId, className, onQuote, loadError = EN['widget.loadError'] }: Props) {
   const el = useRef<HTMLDivElement>(null)
   const onQuoteRef = useRef(onQuote)
   onQuoteRef.current = onQuote
@@ -37,7 +40,7 @@ export function QuoteWidget({ config, testId, className, onQuote }: Props) {
     node.addEventListener('quotelet:quote', listener)
     quotelet().then(
       (Q) => { if (!cancelled) handle = Q.mount(node, typeof config === 'string' ? config : JSON.parse(key)) },
-      () => { if (!cancelled) node.textContent = 'The calculator could not load. Refresh the page to try again.' },
+      () => { if (!cancelled) node.textContent = loadError },
     )
     return () => {
       cancelled = true

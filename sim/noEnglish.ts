@@ -6,38 +6,37 @@ import { ENGLISH_WORDS } from '../apps/web/src/lib/englishWords.ts'
 
 export type UiText = { source: string; text: string }
 
-export async function collectUiText(page: Page): Promise<UiText[]> {
-  return page.evaluate(() => {
-    const out: { source: string; text: string }[] = [{ source: 'document.title', text: document.title }]
-    const ATTRS = ['aria-label', 'title', 'placeholder', 'alt']
-    const visible = (el: Element) => {
-      const h = el as HTMLElement
-      if (h.closest('[hidden]')) return false
-      const cs = getComputedStyle(h)
-      if (cs.display === 'none' || cs.visibility === 'hidden') return false
-      // sr-only text counts: screen readers say it. Only display:none / hidden are skipped.
-      return true
-    }
-    const walk = (root: Document | ShadowRoot, where: string) => {
-      const els = root.querySelectorAll('*')
-      for (const el of els) {
-        if (el.shadowRoot) walk(el.shadowRoot, `${where} > ${el.tagName.toLowerCase()}::shadow`)
-        if (['SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT'].includes(el.tagName)) continue
-        if (!visible(el)) continue
-        for (const a of ATTRS) {
-          const v = el.getAttribute(a)
-          if (v) out.push({ source: `${where} ${el.tagName.toLowerCase()}[${a}]`, text: v })
-        }
-        for (const n of el.childNodes) {
-          if (n.nodeType === Node.TEXT_NODE && n.textContent?.trim()) {
-            out.push({ source: `${where} ${el.tagName.toLowerCase()}`, text: n.textContent.trim() })
-          }
-        }
+// Plain string, not a function: tsx/esbuild adds __name() helpers to functions, which do not
+// exist inside the page.
+const COLLECT = `(() => {
+  const out = [{ source: 'document.title', text: document.title }]
+  const ATTRS = ['aria-label', 'title', 'placeholder', 'alt']
+  const SKIP = ['SCRIPT', 'STYLE', 'TEMPLATE', 'NOSCRIPT']
+  // sr-only text counts (screen readers say it); only hidden / display:none / visibility:hidden is skipped.
+  function visible(el) {
+    if (el.closest('[hidden]')) return false
+    const cs = getComputedStyle(el)
+    return cs.display !== 'none' && cs.visibility !== 'hidden'
+  }
+  function walk(root, where) {
+    for (const el of root.querySelectorAll('*')) {
+      if (el.shadowRoot) walk(el.shadowRoot, where + ' > ' + el.tagName.toLowerCase() + '::shadow')
+      if (SKIP.includes(el.tagName) || !visible(el)) continue
+      for (const a of ATTRS) {
+        const v = el.getAttribute(a)
+        if (v) out.push({ source: where + ' ' + el.tagName.toLowerCase() + '[' + a + ']', text: v })
+      }
+      for (const n of el.childNodes) {
+        if (n.nodeType === 3 && n.textContent.trim()) out.push({ source: where + ' ' + el.tagName.toLowerCase(), text: n.textContent.trim() })
       }
     }
-    walk(document, 'page')
-    return out
-  })
+  }
+  walk(document, 'page')
+  return out
+})()`
+
+export async function collectUiText(page: Page): Promise<UiText[]> {
+  return page.evaluate(COLLECT) as Promise<UiText[]>
 }
 
 export function englishIn(items: UiText[]) {

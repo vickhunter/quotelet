@@ -5,7 +5,8 @@ import { cleanLeadName } from '@quotelet/core/handoff'
 import type { Config, Quote } from '@quotelet/core/types'
 import { QuoteWidget } from '../components/QuoteWidget'
 import { LangPicker } from '../components/LangPicker'
-import { leadText, messageKey, requestMessage, waUrl, type Lang } from '../lib/aperto'
+import { LANGS, leadText, messageKey, requestMessage, waUrl, type Lang } from '../lib/aperto'
+import { loadUiLang, translator, uiLangOfLocale, type T } from '../lib/i18n'
 import { useMeta } from '../lib/useMeta'
 import './share.css'
 
@@ -20,20 +21,23 @@ export function Share() {
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
-  useMeta('Quote calculator')
   const config = useMemo(() => { const r = encoded ? decodeConfig(encoded) : null; return r?.ok ? r.config : null }, [encoded])
+  // The page speaks the calculator's language; with no readable config, the builder's saved choice.
+  const lang = config ? uiLangOfLocale(config.locale) : (loadUiLang(window.localStorage) ?? 'en')
+  const tr = useMemo(() => translator(lang), [lang])
+  useMeta(tr('q.metaTitle'), lang)
 
   return (
     <main className="share-page">
       {encoded ? (
         <>
-          {config ? <SharedCalculator key={encoded} config={config} encoded={encoded} /> : <QuoteWidget config={encoded} testId="share-widget" className="share-widget" />}
+          {config ? <SharedCalculator key={encoded} config={config} encoded={encoded} tr={tr} /> : <QuoteWidget config={encoded} testId="share-widget" className="share-widget" loadError={tr('widget.loadError')} />}
         </>
       ) : (
         <div className="share-empty">
-          <h1>No calculator in this link</h1>
-          <p className="muted">The link looks cut off. Ask for it again, or build your own.</p>
-          <Link to="/build" className="btn btn-primary">Build a calculator</Link>
+          <h1>{tr('q.emptyTitle')}</h1>
+          <p className="muted">{tr('q.emptyBody')}</p>
+          <Link to="/build" search={lang === 'it' ? { lang } : {}} className="btn btn-primary">{tr('q.emptyCta')}</Link>
         </div>
       )}
     </main>
@@ -43,7 +47,7 @@ export function Share() {
 /** Widget plus the optional "message language" toggle. With a language picked, the WhatsApp CTA
  *  sends the server's text (core amounts) instead of core's default message; on any failure the
  *  widget's own CTA runs unchanged. */
-function SharedCalculator({ config, encoded }: { config: Config; encoded: string }) {
+function SharedCalculator({ config, encoded, tr }: { config: Config; encoded: string; tr: T }) {
   const [quote, setQuote] = useState<Quote | null>(null)
   const [lang, setLang] = useState<Lang | null>(null)
   const [msg, setMsg] = useState<Msg | null>(null)
@@ -90,16 +94,17 @@ function SharedCalculator({ config, encoded }: { config: Config; encoded: string
   }, [])
 
   const current = lang && quote && msg && msg.key === messageKey(quote, lang) ? msg : null
+  const langNames = useMemo(() => Object.fromEntries(LANGS.map((l) => [l, tr(`lang.${l}`)])) as Record<Lang, string>, [tr])
   return (
     <div className="share-stack" ref={wrap}>
-      <QuoteWidget config={encoded} testId="share-widget" className="share-widget" onQuote={setQuote} />
-      <section className="msg-lang" aria-label="Message language">
-        <LangPicker name="msg-lang" legend="Message language" value={lang} onChange={setLang} testIdPrefix="msg-lang" />
+      <QuoteWidget config={encoded} testId="share-widget" className="share-widget" onQuote={setQuote} loadError={tr('widget.loadError')} />
+      <section className="msg-lang" aria-label={tr('q.msgLang')}>
+        <LangPicker name="msg-lang" legend={tr('q.msgLang')} value={lang} onChange={setLang} testIdPrefix="msg-lang" names={langNames} />
         {lang && (
           <div className="msg-preview" data-testid="msg-preview" data-lang={current?.lang ?? lang} data-status={current?.status ?? 'loading'} aria-live="polite" lang={lang}>
             {current?.status === 'ready' ? current.text
-              : current?.status === 'fallback' ? <span className="hint">Translation unavailable. WhatsApp uses the standard message.</span>
-              : <span className="hint"><span className="spinner" aria-hidden /> Writing…</span>}
+              : current?.status === 'fallback' ? <span className="hint">{tr('q.msgFallback')}</span>
+              : <span className="hint"><span className="spinner" aria-hidden /> {tr('q.writing')}</span>}
           </div>
         )}
       </section>

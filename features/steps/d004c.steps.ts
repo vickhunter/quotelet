@@ -3,7 +3,7 @@
 import { After, AfterAll, Given, Then, When } from '@cucumber/cucumber'
 import type { Browser, BrowserContext, Page } from 'playwright'
 import assert from 'node:assert/strict'
-import { getTemplate } from '@quotelet/core'
+import { getTemplate } from '../../packages/core/src/index.ts'
 import { launchBrowser } from '../../sim/lib.ts'
 import { englishIn, collectUiText } from '../../sim/noEnglish.ts'
 

@@ -1,0 +1,91 @@
+1
+00:00:00,300 --> 00:00:08,000
+Marco runs a one-person moving company in Lugano.
+
+2
+00:00:08,000 --> 00:00:16,500
+Leads arrive at 21:00, in Italian and in German.
+
+3
+00:00:16,500 --> 00:00:24,800
+He quotes by hand. Whoever answers first gets the job.
+
+4
+00:00:25,000 --> 00:00:31,500
+Quotelet Aperto: he writes his prices in plain German.
+
+5
+00:00:31,500 --> 00:00:39,000
+Apertus turns the text into a calculator config.
+
+6
+00:00:39,000 --> 00:00:47,000
+The validator checks it: 4 fields, formula OK.
+
+7
+00:00:47,000 --> 00:00:56,000
+Prices stay a checked formula in code. Apertus never does the math.
+
+8
+00:00:56,000 --> 00:01:04,800
+Live preview in de-CH with CHF. Copy the link or the embed code.
+
+9
+00:01:05,000 --> 00:01:13,000
+The customer opens the link. The config lives in the URL, nothing is stored.
+
+10
+00:01:13,000 --> 00:01:24,000
+20 m³, 3rd floor, no lift.
+
+11
+00:01:24,000 --> 00:01:34,800
+A range with VAT, computed and formatted by Quotelet core.
+
+12
+00:01:35,000 --> 00:01:42,000
+Message language: Italian. Apertus writes the words only.
+
+13
+00:01:42,000 --> 00:01:49,000
+French, German: the amounts come from core, never from the model.
+
+14
+00:01:49,000 --> 00:01:54,800
+WhatsApp gets the Italian text with the same amounts.
+
+15
+00:01:55,000 --> 00:02:01,000
+Now a vague price list: "a bit more on Sundays".
+
+16
+00:02:01,000 --> 00:02:08,000
+The validator rejects it. One repair try asks for a number.
+
+17
+00:02:08,000 --> 00:02:14,800
+Still no number, so the errors are shown. No guessed prices.
+
+18
+00:02:15,000 --> 00:02:23,000
+Public eval: 30 price lists, 4 languages, 8B vs 70B.
+
+19
+00:02:23,000 --> 00:02:31,000
+Valid configs, quote match, latency and cost per calculator.
+
+20
+00:02:31,000 --> 00:02:39,800
+These rows are a dry run of the harness. Real Apertus numbers come next.
+
+21
+00:02:40,000 --> 00:02:47,500
+Open weights: self-host Apertus with vLLM or Ollama, same env vars.
+
+22
+00:02:47,500 --> 00:02:54,800
+No database, no cookies. Price lists and quotes stay with you.
+
+23
+00:02:55,000 --> 00:02:58,300
+Quotelet Aperto. Plain words in, checked calculators out.

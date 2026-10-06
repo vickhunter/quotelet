@@ -4,6 +4,9 @@
 import type { Page } from 'playwright'
 import { ENGLISH_WORDS } from '../apps/web/src/lib/englishWords.ts'
 
+// Words on the EN list that are also correct German or French UI words (widget /q chrome).
+export const ALSO_DE_FR = new Set(['name', 'total', 'message', 'option', 'options', 'start', 'code', 'default'])
+
 export type UiText = { source: string; text: string }
 
 // Plain string, not a function: tsx/esbuild adds __name() helpers to functions, which do not
@@ -39,11 +42,11 @@ export async function collectUiText(page: Page): Promise<UiText[]> {
   return page.evaluate(COLLECT) as Promise<UiText[]>
 }
 
-export function englishIn(items: UiText[]) {
+export function englishIn(items: UiText[], allow: ReadonlySet<string> = new Set()) {
   const hits: { word: string; source: string; text: string }[] = []
   for (const it of items) {
     for (const w of it.text.toLowerCase().match(/\p{L}+/gu) ?? []) {
-      if (ENGLISH_WORDS.has(w)) hits.push({ word: w, ...it })
+      if (ENGLISH_WORDS.has(w) && !allow.has(w)) hits.push({ word: w, ...it })
     }
   }
   return hits

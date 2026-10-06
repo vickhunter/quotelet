@@ -8,7 +8,7 @@ import { Share } from './routes/Share'
 import { ItPainters } from './routes/ItPainters'
 import { NotFound } from './routes/NotFound'
 import { Aperto } from './routes/Aperto'
-import { isUiLang, type UiLang } from './lib/i18n'
+import { isBuilderLang, type BuilderLang } from './lib/i18n'
 
 const rootRoute = createRootRoute({
   component: Outlet,
@@ -18,9 +18,9 @@ const routeTree = rootRoute.addChildren([
   createRoute({ getParentRoute: () => rootRoute, path: '/', component: Landing }),
   createRoute({
     getParentRoute: () => rootRoute, path: '/build', component: Build,
-    validateSearch: (s: Record<string, unknown>): { template?: string; lang?: UiLang } => ({
+    validateSearch: (s: Record<string, unknown>): { template?: string; lang?: BuilderLang } => ({
       template: typeof s.template === 'string' ? s.template : undefined,
-      lang: isUiLang(s.lang) ? s.lang : undefined,
+      lang: isBuilderLang(s.lang) ? s.lang : undefined,
     }),
   }),
   createRoute({ getParentRoute: () => rootRoute, path: '/q', component: Share }),

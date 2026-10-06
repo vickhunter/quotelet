@@ -37,7 +37,7 @@ export function Share() {
         <div className="share-empty">
           <h1>{tr('q.emptyTitle')}</h1>
           <p className="muted">{tr('q.emptyBody')}</p>
-          <Link to="/build" search={lang === 'it' ? { lang } : {}} className="btn btn-primary">{tr('q.emptyCta')}</Link>
+          <Link to="/build" search={lang === 'it' ? { lang: 'it' } : {}} className="btn btn-primary">{tr('q.emptyCta')}</Link>
         </div>
       )}
     </main>

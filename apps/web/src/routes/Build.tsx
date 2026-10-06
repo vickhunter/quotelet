@@ -8,7 +8,7 @@ import { formulaErrorMessage } from '../lib/formulaError'
 import { embedSnippet, shareLink } from '../lib/share'
 import { useCopy } from '../lib/useCopy'
 import { useMeta } from '../lib/useMeta'
-import { loadUiLang, resolveUiLang, saveUiLang, translator, type T, type UiLang } from '../lib/i18n'
+import { loadUiLang, resolveUiLang, saveUiLang, translator, type BuilderLang, type T } from '../lib/i18n'
 import { QuoteWidget } from '../components/QuoteWidget'
 import { SiteHeader, Phone } from '../components/Chrome'
 import { UiLangSwitch } from '../components/UiLangSwitch'
@@ -83,14 +83,14 @@ function FieldEditor({ field, dispatch, tr }: { field: Field; dispatch: React.Di
 export function Build() {
   const { template, lang: langParam } = useSearch({ from: '/build' })
   const navigate = useNavigate({ from: '/build' })
-  const [lang, setLang] = useState<UiLang>(() =>
+  const [lang, setLang] = useState<BuilderLang>(() =>
     resolveUiLang({ param: langParam, template, stored: typeof window !== 'undefined' ? loadUiLang(window.localStorage) : undefined }))
   const tr = useMemo(() => translator(lang), [lang])
   useEffect(() => saveUiLang(window.localStorage, lang), [lang])
   useMeta(tr('build.metaTitle'), lang)
-  const switchLang = (l: UiLang) => {
+  const switchLang = (l: BuilderLang) => {
     setLang(l)
-    void navigate({ search: (s: { template?: string; lang?: UiLang }) => ({ ...s, lang: l }), replace: true })
+    void navigate({ search: (s: { template?: string; lang?: BuilderLang }) => ({ ...s, lang: l }), replace: true })
   }
   const [state, dispatch] = useReducer(builderReducer, template, startState)
   const { copied, copy } = useCopy()

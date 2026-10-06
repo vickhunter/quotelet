@@ -1,7 +1,7 @@
-import { UI_LANGS, translator, type UiLang } from '../lib/i18n'
+import { UI_LANGS, translator, type BuilderLang } from '../lib/i18n'
 
 /** IT / EN switch for the builder UI. Native radios: arrow keys move, screen readers hear the full name. */
-export function UiLangSwitch({ value, onChange }: { value: UiLang; onChange: (l: UiLang) => void }) {
+export function UiLangSwitch({ value, onChange }: { value: BuilderLang; onChange: (l: BuilderLang) => void }) {
   const tr = translator(value)
   return (
     <fieldset className="seg-group ui-lang">

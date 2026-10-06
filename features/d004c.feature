@@ -11,6 +11,11 @@ Feature: Italian builder for painters (D-004c)
     When the painter types the WhatsApp number "333"
     Then the WhatsApp error reads "Troppo corto"
     And the painter sees no English text
+    When the painter types the WhatsApp number "333 000 0000"
+    Then the WhatsApp error reads "Manca il prefisso internazionale. Scrivi +39 prima del numero."
+    And the painter cannot copy the share link yet
+    And no share link points at "wa.me/3330000000"
+    And the painter sees no English text
     When the painter writes the formula "mq * prezzo_inesistente"
     Then the formula error reads "Nome sconosciuto" and names "prezzo_inesistente"
     And the painter cannot copy the share link yet

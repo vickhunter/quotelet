@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import type { Config } from '@quotelet/core/types'
-import { builderReducer, initBuilder, normalizeWhatsapp, whatsappProblem, canShare } from './builder'
+import { builderReducer, initBuilder, normalizeWhatsapp, whatsappProblem, whatsappProblemKey, canShare } from './builder'
+import { t } from './i18n'
 
 const cfg: Config = JSON.parse(readFileSync(new URL('../../../../fixtures/config-imbianchino.json', import.meta.url), 'utf8'))
 
@@ -60,7 +61,11 @@ describe('builder reducer', () => {
 describe('whatsapp helpers', () => {
   test('normalise strips everything but digits', () => {
     expect(normalizeWhatsapp('+39 333 123 4567')).toBe('393331234567')
-    expect(normalizeWhatsapp('(0039) 333-123')).toBe('0039333123')
+  })
+  test('a leading 00 is the international prefix: dropped, so wa.me gets 39... not 0039...', () => {
+    expect(normalizeWhatsapp('(0039) 333-123')).toBe('39333123')
+    expect(normalizeWhatsapp('0039 333 000 0000')).toBe('393330000000')
+    expect(normalizeWhatsapp(' 0041 79 123 45 67')).toBe('41791234567')
   })
   test('problem messages for short, long and lettered numbers; none for empty or valid', () => {
     expect(whatsappProblem('')).toBeNull()
@@ -69,9 +74,29 @@ describe('whatsapp helpers', () => {
     expect(whatsappProblem('1234567890123456')).toMatch(/long/i)
     expect(whatsappProblem('39abc3331234')).toMatch(/digits/i)
   })
+  test('an Italian mobile typed without the country code is flagged (D-004c follow-up)', () => {
+    for (const raw of ['333 000 0000', '3330000000', '333 1234567', '347 123 456', ' 3201234567 ']) expect(whatsappProblemKey(raw), raw).toBe('wa.prefix')
+  })
+  test('numbers with +, 00 or a full country code pass; foreign numbers are not touched', () => {
+    for (const raw of ['+39 333 000 0000', '0039 333 000 0000', '+39 3330000000', '393330000000', '+41 79 123 45 67', '0041 79 123 45 67', '+44 7700 900123'])
+      expect(whatsappProblemKey(raw), raw).toBeNull()
+  })
+  test('the prefix messages are clear in IT and EN', () => {
+    expect(t('it', 'wa.prefix')).toBe('Manca il prefisso internazionale. Scrivi +39 prima del numero.')
+    expect(t('en', 'wa.prefix')).toBe('Country code missing. Type +39 before the number.')
+    expect(whatsappProblem('333 000 0000')).toBe('Country code missing. Type +39 before the number.')
+  })
 })
 
 describe('canShare', () => {
+  test('a number without the country code blocks sharing and never reaches the config', () => {
+    const s = builderReducer(builderReducer(initBuilder(), { type: 'loadTemplate', config: cfg }), { type: 'setWhatsapp', raw: '333 000 0000' })
+    expect(s.config.business.whatsapp).toBeUndefined()
+    expect(canShare(s, { formulaOk: true })).toBe(false)
+    const ok = builderReducer(s, { type: 'setWhatsapp', raw: '0039 333 000 0000' })
+    expect(ok.config.business.whatsapp).toBe('393330000000')
+    expect(canShare(ok, { formulaOk: true })).toBe(true)
+  })
   test('needs a valid formula, a business name and no whatsapp problem', () => {
     let s = builderReducer(initBuilder(), { type: 'loadTemplate', config: cfg })
     expect(canShare(s, { formulaOk: true })).toBe(true)

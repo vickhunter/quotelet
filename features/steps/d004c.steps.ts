@@ -158,3 +158,23 @@ Then('the builder heading reads {string}', async function (this: World, text: st
   assert.equal(await p.locator('h1').textContent(), text)
   assert.equal(await p.evaluate(() => document.documentElement.lang), 'en')
 })
+
+Then('no share link points at {string}', async function (this: World, target: string) {
+  const p = await painter(this)
+  // The share input stays empty while sharing is blocked, and the preview widget's WhatsApp
+  // button must not open that number either.
+  assert.equal(await p.locator('[data-testid="share-link"], .share-row input').first().inputValue(), '')
+  await p.evaluate(() => {
+    const w = window as unknown as { __opened: string[] }
+    w.__opened = []
+    window.open = ((u?: string | URL) => { w.__opened.push(String(u)); return null }) as typeof window.open
+  })
+  const preview = p.locator('[data-testid="preview"]')
+  const name = preview.locator('[data-testid="ql-name"]')
+  if (await name.count()) await name.fill('Giulia')
+  await preview.locator('[data-testid="ql-cta-whatsapp"]').click()
+  await p.waitForTimeout(300)
+  const opened = await p.evaluate(() => (window as unknown as { __opened: string[] }).__opened)
+  assert.ok(opened.length > 0, 'the preview CTA opened nothing')
+  assert.deepEqual(opened.filter((u) => u.includes(target)), [], `opened ${opened}`)
+})

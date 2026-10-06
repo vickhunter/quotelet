@@ -8,6 +8,10 @@
     "test": "bun test src"
   },
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@quotelet/core": "workspace:*",
     "@tanstack/react-router": "^1.130.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

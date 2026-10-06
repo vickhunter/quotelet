@@ -1,9 +1,9 @@
 // D-004 persona simulations (design section 13): 1 Giulia on the real /q page, 2 Marco through /build.
 // Run: `bun run build && bun run serve` in one shell, then `bun run sim:d004`. Logs to proof/sim-<date>.log.
-import { chromium, type Browser, type Page, type Request } from 'playwright'
+import { type Browser, type Page, type Request } from 'playwright'
 import { readFileSync, appendFileSync, mkdirSync } from 'node:fs'
-import { computeQuote, defaultAnswers, buildWhatsAppUrl, validateConfig } from '@quotelet/core'
-import { setField, base64url } from './lib.ts'
+import { computeQuote, defaultAnswers, buildWhatsAppUrl, validateConfig } from '../packages/core/src/index.ts'
+import { setField, base64url, launchBrowser } from './lib.ts'
 
 const BASE = process.env.QL_BASE ?? 'http://127.0.0.1:4173'
 const ORIGIN = new URL(BASE).origin
@@ -111,7 +111,7 @@ async function marco(browser: Browser) {
   return fails.concat(await giulia(browser, link.replace(/^https?:\/\/[^/]+/, BASE), marcoCfg, 'giulia-on-marco-link'))
 }
 
-const browser = await chromium.launch({ channel: 'chrome', headless: true })
+const browser = await launchBrowser()
 const results: Record<string, string[]> = {}
 try {
   results['1 Giulia /q'] = await giulia(browser, `${BASE}/q#c=${base64url(fixture)}`, config, 'giulia-q')

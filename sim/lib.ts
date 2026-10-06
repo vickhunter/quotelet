@@ -15,3 +15,10 @@ export async function setField(root: Locator, id: string, value: number | boolea
 }
 
 export const base64url = (json: unknown) => Buffer.from(JSON.stringify(json)).toString('base64url')
+
+// Bundled Playwright chromium first; system Chrome only as a fallback (QL_CHANNEL=chrome forces it).
+export async function launchBrowser() {
+  const { chromium } = await import('playwright')
+  if (process.env.QL_CHANNEL) return chromium.launch({ channel: process.env.QL_CHANNEL })
+  try { return await chromium.launch() } catch { return chromium.launch({ channel: 'chrome' }) }
+}

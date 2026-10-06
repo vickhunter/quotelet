@@ -1,8 +1,9 @@
 // UI/UX steps for the @D-004 scenarios (landing, /build, /q). Owner: UI/UX.
 // Runs against the local static build: `bun run build && bun run serve` (127.0.0.1:4173).
 import { Before, After, AfterAll, Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber'
-import { chromium, type Browser, type BrowserContext, type Page, } from 'playwright'
+import { type Browser, type BrowserContext, type Page, } from 'playwright'
 import assert from 'node:assert/strict'
+import { launchBrowser } from '../../sim/lib.ts'
 
 setDefaultTimeout(30_000)
 
@@ -22,7 +23,7 @@ type World = {
 
 let sharedBrowser: Browser | undefined
 async function browser() {
-  sharedBrowser ??= await chromium.launch({ channel: 'chrome', headless: true })
+  sharedBrowser ??= await launchBrowser()
   return sharedBrowser
 }
 
@@ -96,18 +97,13 @@ When('I change the {string} price to {int}', async function (this: World, label:
 Then('the live preview high amount updates', async function (this: World) {
   const p = await page(this)
   const high = preview(p).locator('[data-testid="ql-result-high"]')
-  await assert.doesNotReject(
-    high.evaluate(
-      (el, before) =>
-        new Promise<void>((ok, ko) => {
-          const t0 = Date.now()
-          const tick = () => (el.textContent !== before ? ok() : Date.now() - t0 > 2000 ? ko() : requestAnimationFrame(tick))
-          tick()
-        }),
-      this.previewHighBefore,
-    ),
-    'preview high amount did not change',
-  )
+  const t0 = Date.now()
+  let now = await high.textContent()
+  while (now === this.previewHighBefore && Date.now() - t0 < 3000) {
+    await p.waitForTimeout(50)
+    now = await high.textContent()
+  }
+  assert.notEqual(now, this.previewHighBefore, 'preview high amount did not change')
 })
 
 Then('I can copy a share link and an embed snippet', async function (this: World) {

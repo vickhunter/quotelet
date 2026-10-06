@@ -323,8 +323,8 @@ const badCfg = (locale: string) => ({
   formula: "volumne * 2 +", vat: { rate: 300, pricesInclude: true, show: true },
 });
 
-describe("widget error list in German and French", () => {
-  for (const locale of ["de-CH", "fr-CH", "de-DE", "fr-FR"]) {
+describe("widget error list in German, French and Italian", () => {
+  for (const locale of ["de-CH", "fr-CH", "de-DE", "fr-FR", "it-CH", "it-IT"]) {
     for (const via of ["object", "data-config"] as const) {
       test(`invalid ${locale} config (${via}): error list has no English words; event keeps the English messages`, async () => {
         const el = via === "object" ? host() : host({ "data-quotelet": "", "data-config": b64u(JSON.stringify(badCfg(locale))) });

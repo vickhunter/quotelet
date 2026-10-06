@@ -8,6 +8,7 @@ export { buildWhatsAppUrl, buildMailtoUrl, buildLeadMessage } from "./handoff.ts
 export { encodeConfig, decodeConfig } from "./encode.ts";
 export type { DecodeResult } from "./encode.ts";
 export { listTemplates, getTemplate } from "./templates.ts";
-export { strings } from "./i18n.ts";
+export { strings, lang } from "./i18n.ts";
+export { ERRORS, errorCode, localizeError, localizeMessage, localizePath } from "./errors.ts";
 export type { Answers, Config, Field, NumberField, ChoiceField, ToggleField, Quote, ValidationError } from "./types.ts";
 export { LIMITS } from "./types.ts";

@@ -12,7 +12,7 @@ const fill = (tpl: string) => tpl.replace(/%(\d)/g, (_, i) => ["7", "12"][Number
 
 // Invalid inputs that between them hit every message the validator, decoder and formula parser can produce.
 const base = () => ({ v: 1, id: "umzug", locale: "de-CH", currency: "CHF", title: "Umzug", business: { name: "Muster" }, fields: [{ id: "volumen", type: "number", label: "Volumen", min: 1, max: 100 }], formula: "volumen * 45" });
-const FORMULAS = ["volumen +", "volumen = 2", "volumen $ 2", "if(volumen > 2, 1", "max(", "round(1, 2)", "min()", "if(volumen, 1)", "volumen > 2", "volumen 2", "abc", "((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))", "", "x".repeat(2000), "round", "1 / 0", ")"];
+const FORMULAS = ["volumen +", "volumen = 2", "volumen $ 2", "if(volumen > 2, 1", "max(", "round(1, 2)", "min()", "if(volumen, 1)", "volumen > 2", "volumen 2", "abc", "((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))", "", "x".repeat(2000), "round", "1 / 0", ")", "volumen # 2", "max(1, 2", "max(1 2)", "round(volumen"];
 function corpus(): { path: string; message: string }[] {
   const out: { path: string; message: string }[] = [];
   const add = (r: any) => { if (!r.ok) out.push(...r.errors); else out.push(...r.warnings); };
@@ -36,6 +36,8 @@ function corpus(): { path: string; message: string }[] {
   add(validateConfig({ ...base(), formula: "volumen / (volumen - volumen)" }));
   for (const f of FORMULAS) add(validateConfig({ ...base(), formula: f }));
   for (const s of [5 as any, "", "x".repeat(9000), "a$b", "_____", "gA", btoa("{bad json").replace(/=+$/, "")]) add(decodeConfig(s));
+  add(validateConfig({ ...base(), title: undefined }));
+  for (const f of [5, null]) { const r: any = compileFormula(f as any, []); if (!r.ok) out.push({ path: "formula", message: r.error.message }); }
   const c = compileFormula("1 / 0", []); if (c.ok) c.warnings.forEach((w) => out.push({ path: "formula", message: w }));
   return out;
 }
@@ -58,9 +60,11 @@ describe("config error messages: stable codes + it/en/de/fr display text", () =>
     const unmapped = [...new Set(all.filter((m) => errorCode(m) === null))];
     expect(unmapped).toEqual([]);
     // and the corpus exercises (almost) every code
-    const used = new Set(all.map((m) => errorCode(m)));
+    // nested formula errors count too: 'Unknown identifier "x" (at position 0)' uses formulaAt + unknownId
+    const used = new Set(all.flatMap((m) => [errorCode(m), errorCode(m.replace(/ \(at position \d+\)$/, ""))]));
     const unused = Object.keys(ERRORS).filter((c) => !used.has(c));
-    expect(unused.length).toBeLessThanOrEqual(3);
+    // defensive catch-alls that valid inputs cannot reach on current runtimes
+    expect(unused.filter((c) => !["currencyUnsupported", "notValidated", "encRead", "formulaParse"].includes(c))).toEqual([]);
   });
 
   test("the machine-readable shape is unchanged: {path, message} with the English message", () => {
@@ -89,12 +93,12 @@ describe("config error messages: stable codes + it/en/de/fr display text", () =>
     expect(englishIn(localizeError({ path: "", message: "JSON Parse error: Unexpected EOF" }, "de-CH"))).toEqual([]);
   });
 
-  for (const lang of ["de-CH", "fr-CH", "de", "fr", "de-DE", "fr-FR"]) {
+  for (const lang of ["de-CH", "fr-CH", "de", "fr", "de-DE", "fr-FR", "it-CH", "it-IT"]) {
     test(`${lang}: every error text and every path in the corpus has zero English words`, () => {
       const lines = [...corpus(), ...WIDGET_MESSAGES.map((message) => ({ path: "", message }))].map((e) => localizeError(e, lang));
       const bad = lines.map((l) => ({ l, en: englishIn(l) })).filter((x) => x.en.length);
       expect(bad).toEqual([]);
-      for (const code of Object.keys(ERRORS)) expect(englishIn(fill(ERRORS[code][lang.slice(0, 2) as "de" | "fr"]))).toEqual([]);
+      for (const code of Object.keys(ERRORS)) expect(englishIn(fill(ERRORS[code][lang.slice(0, 2) as "de" | "fr" | "it"]))).toEqual([]);
     });
   }
 

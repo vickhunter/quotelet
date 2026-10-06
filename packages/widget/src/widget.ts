@@ -3,6 +3,7 @@
 // request is the data-config-url GET. Every public entry point swallows errors so the host page
 // never sees a throw.
 import { decodeConfig } from "../../core/src/encode.ts";
+import { localizeError } from "../../core/src/errors.ts";
 import { buildMailtoUrl, buildWhatsAppUrl, cleanLeadName } from "../../core/src/handoff.ts";
 import { strings, type Strings } from "../../core/src/i18n.ts";
 import { computeQuote, defaultAnswers, normalizeAnswers } from "../../core/src/quote.ts";
@@ -34,9 +35,19 @@ function emit(host: Element, type: string, detail: unknown): void {
   try { host.dispatchEvent(new CustomEvent(type, { detail, bubbles: true, composed: true })); } catch { /* never throw into the host */ }
 }
 
-function uiStrings(config?: Config): Strings {
-  if (config) return strings(config.locale);
-  try { return strings(document.documentElement.lang || navigator.language); } catch { return strings("en"); }
+/** UI language: the config's locale, else the host element / page language, else the browser's. */
+function uiLocale(host: Element | null, hint?: string): string {
+  if (hint) return hint;
+  try { return host?.closest("[lang]")?.getAttribute("lang") || document.documentElement.lang || navigator.language || "en"; } catch { return "en"; }
+}
+
+/** Best-effort `locale` of a config that failed validation, so its errors show in its language. */
+function localeOf(input: unknown): string | undefined {
+  try {
+    let o: any = input;
+    if (typeof input === "string") o = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(input.trim().replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0))));
+    return o && typeof o.locale === "string" && o.locale.length < 36 ? o.locale : undefined;
+  } catch { return undefined; }
 }
 
 function resolve(input: unknown): { ok: true; config: Config } | { ok: false; errors: ValidationError[] } {
@@ -49,9 +60,11 @@ function shadowOf(el: Element): ShadowRoot {
   return el.shadowRoot ?? el.attachShadow({ mode: "open" });
 }
 
-function renderError(host: Element, root: ShadowRoot, errors: ValidationError[], config?: Config): void {
-  const t = uiStrings(config);
-  const list = h("ul", {}, undefined, errors.slice(0, 5).map((e) => h("li", {}, e.path ? `${e.path}: ${e.message}` : e.message)));
+function renderError(host: Element, root: ShadowRoot, errors: ValidationError[], localeHint?: string): void {
+  const locale = uiLocale(host, localeHint);
+  const t = strings(locale);
+  // Display text in the widget language (fix 8b); the event below keeps the machine-readable English.
+  const list = h("ul", {}, undefined, errors.slice(0, 5).map((e) => h("li", {}, localizeError(e, locale))));
   root.replaceChildren(h("style", {}, CSS), h("div", { class: "err", role: "alert", "data-testid": "ql-error" }, undefined, [h("strong", {}, t.errorTitle), list]));
   emit(host, "quotelet:error", { errors: errors.map((e) => ({ path: e.path, message: e.message })) });
 }
@@ -65,7 +78,7 @@ export function mount(el: Element, configOrEncoded: unknown): Handle {
     const root = shadowOf(el);
     const r = resolve(configOrEncoded);
     if (!r.ok) {
-      renderError(el, root, r.errors);
+      renderError(el, root, r.errors, localeOf(configOrEncoded));
       const handle = { update() {}, destroy() { try { root.replaceChildren(); live.delete(el); } catch { /* ignore */ } } };
       live.set(el, handle);
       return handle;

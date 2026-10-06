@@ -53,8 +53,12 @@ const fr: Strings = {
   errorTitle: "Ce calculateur n'est pas configuré correctement.", poweredBy: "Créé avec Quotelet", estimateLabel: "Estimation",
 };
 const TABLES: Record<string, Strings> = { it, en, de, fr };
+export type Lang = "it" | "en" | "de" | "fr";
 /** Language from a BCP 47 tag ("de-CH" -> de, "fr_FR" -> fr); unknown languages get English. */
+export function lang(locale: string | undefined | null): Lang {
+  const l = String(locale || "").toLowerCase().split(/[-_]/)[0];
+  return Object.prototype.hasOwnProperty.call(TABLES, l) ? (l as Lang) : "en"; // no prototype keys ("constructor")
+}
 export function strings(locale: string | undefined | null): Strings {
-  const lang = String(locale || "").toLowerCase().split(/[-_]/)[0];
-  return Object.prototype.hasOwnProperty.call(TABLES, lang) ? TABLES[lang] : en; // no prototype keys ("constructor")
+  return TABLES[lang(locale)];
 }

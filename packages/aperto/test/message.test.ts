@@ -96,6 +96,13 @@ describe("draftMessage: model writes wording only; core fills {LOW} {HIGH} {VAT}
     for (const lang of ["it", "de", "fr", "en"] as Lang[]) expect(checkWording(templateWording(lang), { needVat: true })).toEqual([]);
   });
 
+  test("Swiss amounts use U+2019 grouping (same as the widget), never U+0027", async () => {
+    const q = computeQuote(moverCfg, { volumen: 20, etage_auszug: 3, ohne_lift: true });
+    const r = await draftMessage(moverCfg, q, "it", { client: replayClient(["Stima da {LOW} a {HIGH}. {VAT}"]) });
+    expect(r.text).toContain("CHF 1\u2019060.00");
+    expect(r.text).not.toContain("1'060");
+  });
+
   test("amounts come from cents, not from client display strings (tampered display is ignored)", async () => {
     const tampered = { ...moverQuote, display: { ...moverQuote.display, low: "CHF 1.00", high: "CHF 2.00" } };
     const r = await draftMessage(moverCfg, tampered, "en", { client: replayClient(["Estimate {LOW} - {HIGH}. {VAT}"]) });

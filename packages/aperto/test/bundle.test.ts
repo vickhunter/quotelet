@@ -34,5 +34,7 @@ describe("Vercel pre-bundle (api/aperto.mjs)", () => {
     const j = JSON.parse(r.stdout.trim());
     expect(j).toMatchObject({ ok: true, fields: 4, mok: true, big: 413, foreign: 403 });
     expect(j.text).toContain("CHF 860.00");
+    expect(j.text).toContain("CHF 1\u2019060.00"); // U+2019 under Node too (core formatMoney)
+    expect(j.text).not.toContain("1'060");
   }, 30000);
 });

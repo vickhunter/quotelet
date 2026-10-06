@@ -11,5 +11,5 @@ cpSync(widget, join(OUT, 'quotelet.js'))
 if (existsSync(join(ROOT, 'harness'))) cpSync(join(ROOT, 'harness'), join(OUT, 'harness'), { recursive: true })
 for (const f of ['config-imbianchino.json']) if (existsSync(join(ROOT, 'fixtures', f))) cpSync(join(ROOT, 'fixtures', f), join(OUT, 'fixtures', f), { recursive: true })
 // Static host config: SPA fallback for /build, /q, /it/... (Vercel).
-writeFileSync(join(OUT, 'vercel.json'), JSON.stringify({ rewrites: [{ source: '/((?!assets/|fonts/|harness/|fixtures/|quotelet\\.js|favicon\\.svg).*)', destination: '/index.html' }] }, null, 2))
+writeFileSync(join(OUT, 'vercel.json'), JSON.stringify({ rewrites: [{ source: '/((?!api/|assets/|fonts/|harness/|fixtures/|quotelet\\.js|favicon\\.svg).*)', destination: '/index.html' }] }, null, 2))
 console.log('assembled', OUT)

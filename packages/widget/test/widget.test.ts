@@ -315,3 +315,56 @@ describe("widget in German and French (de-CH / fr-CH)", () => {
     expect(Bun.gzipSync(readFileSync(BUNDLE)).length).toBeLessThanOrEqual(15360);
   });
 });
+
+// ---- fix 8b: the config error list follows the widget language; lead booleans localized -------------
+const badCfg = (locale: string) => ({
+  ...swissCfg(locale.startsWith("de") ? "de" : "fr"), locale,
+  fields: [{ id: "volumen", type: "number", label: "Volumen", min: "a", max: 100 }, { id: "etage", type: "choice", label: "Etage", options: [] }, { id: "lift", type: "toggle", label: "Lift", on: 1 }],
+  formula: "volumne * 2 +", vat: { rate: 300, pricesInclude: true, show: true },
+});
+
+describe("widget error list in German and French", () => {
+  for (const locale of ["de-CH", "fr-CH", "de-DE", "fr-FR"]) {
+    for (const via of ["object", "data-config"] as const) {
+      test(`invalid ${locale} config (${via}): error list has no English words; event keeps the English messages`, async () => {
+        const el = via === "object" ? host() : host({ "data-quotelet": "", "data-config": b64u(JSON.stringify(badCfg(locale))) });
+        const ev = record(el);
+        if (via === "object") mount(el, badCfg(locale)); else autoMount(document);
+        await tick();
+        const box = $(el, "ql-error")!;
+        expect(box).not.toBeNull();
+        const text = uiText(el);
+        expect(text.length).toBeGreaterThan(2);
+        const words = text.join(" ").toLowerCase().split(/[^\p{L}]+/u).filter(Boolean);
+        const english = words.filter((w) => ENGLISH_WORDS.has(w) && !ALSO_DE_FR.has(w) && w !== "position" && w !== "type");
+        expect({ locale, english, text }).toEqual({ locale, english: [], text });
+        expect(text).toContain(i18n(locale).errorTitle);
+        const detail = ev.find((e) => e.type === "quotelet:error")!.detail;
+        expect(detail.errors.some((x: any) => x.message === "must be a number" && x.path === "fields[0].min")).toBe(true);
+      });
+    }
+  }
+
+  test("English configs keep the exact 'path: message' lines", async () => {
+    const el = host();
+    mount(el, { ...badCfg("de-CH"), locale: "en-GB" });
+    await tick();
+    expect(uiText(el)).toContain("fields[0].min: must be a number");
+  });
+
+  test("de-CH WhatsApp link: toggle answers are Ja/Nein, never Yes/No", async () => {
+    const el = host({ "data-quotelet": "", "data-config": b64u(JSON.stringify(swissCfg("de"))) });
+    autoMount(document);
+    await tick();
+    const name = $(el, "ql-name") as HTMLInputElement;
+    name.value = "Anna"; name.dispatchEvent(new Event("input", { bubbles: true }));
+    ($(el, "ql-cta-whatsapp") as HTMLElement).click();
+    const text = decodeURIComponent(opened[0].split("?text=")[1]);
+    expect(text).toContain("- Ohne Lift: Ja");
+    expect(text).not.toMatch(/\b(Yes|No)\b/);
+  });
+
+  test("widget bundle with the error catalog still under 15,360 B gzip", () => {
+    expect(Bun.gzipSync(readFileSync(BUNDLE)).length).toBeLessThanOrEqual(15360);
+  });
+});

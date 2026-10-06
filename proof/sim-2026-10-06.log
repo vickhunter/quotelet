@@ -132,3 +132,9 @@ SUMMARY sim:d003 personas 4/4 passed (P1 PASS, P3 PASS, P4 PASS, P5 PASS); check
 2026-10-06T07:34:39.037Z [d004] PASS persona 1 Giulia /q
 2026-10-06T07:34:39.037Z [d004] PASS persona 2 Marco /build
 2026-10-06T07:34:39.037Z [d004] sim:d004 PASSED
+2026-10-06T10:46:01.645Z [d004] giulia-q: actions=5 low="1780,00 €" high="2380,00 €" PASS
+2026-10-06T10:46:04.641Z [d004] marco: link=https://quotelet.vercel.app/q#c=eyJ2IjoxLCJpZCI6ImltYmlhbmNo… PASS
+2026-10-06T10:46:05.370Z [d004] giulia-on-marco-link: actions=5 low="1780,00 €" high="2380,00 €" PASS
+2026-10-06T10:46:05.390Z [d004] PASS persona 1 Giulia /q
+2026-10-06T10:46:05.390Z [d004] PASS persona 2 Marco /build
+2026-10-06T10:46:05.390Z [d004] sim:d004 PASSED

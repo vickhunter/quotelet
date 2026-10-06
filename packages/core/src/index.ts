@@ -1,12 +1,13 @@
-// D-003 red phase: public API surface of @quotelet/core (design 10.2). Not implemented yet.
-const todo = (name: string) => () => { throw new Error(`${name}: not implemented`); };
-export const validateConfig: (input: unknown) => any = todo("validateConfig");
-export const compileFormula: (src: string, fieldIds: string[]) => any = todo("compileFormula");
-export const defaultAnswers: (config: any) => any = todo("defaultAnswers");
-export const computeQuote: (config: any, answers: any) => any = todo("computeQuote");
-export const buildWhatsAppUrl: (config: any, quote: any, lead: { name: string }) => string = todo("buildWhatsAppUrl");
-export const buildMailtoUrl: (config: any, quote: any, lead: { name: string }) => string | null = todo("buildMailtoUrl");
-export const encodeConfig: (config: any) => string = todo("encodeConfig");
-export const decodeConfig: (s: string) => any = todo("decodeConfig");
-export const listTemplates: () => { id: string; locale: string; title: string }[] = todo("listTemplates");
-export const getTemplate: (id: string) => any = todo("getTemplate");
+// @quotelet/core — public API (design 10.2). Pure TS, no DOM, zero runtime dependencies.
+export { validateConfig } from "./schema.ts";
+export type { ValidateResult } from "./schema.ts";
+export { compileFormula } from "./formula.ts";
+export type { CompileResult, CompiledFormula, FormulaError, EvalResult } from "./formula.ts";
+export { defaultAnswers, computeQuote, normalizeAnswers } from "./quote.ts";
+export { buildWhatsAppUrl, buildMailtoUrl, buildLeadMessage } from "./handoff.ts";
+export { encodeConfig, decodeConfig } from "./encode.ts";
+export type { DecodeResult } from "./encode.ts";
+export { listTemplates, getTemplate } from "./templates.ts";
+export { strings } from "./i18n.ts";
+export type { Answers, Config, Field, NumberField, ChoiceField, ToggleField, Quote, ValidationError } from "./types.ts";
+export { LIMITS } from "./types.ts";

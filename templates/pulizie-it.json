@@ -1,0 +1,72 @@
+{
+  "v": 1,
+  "id": "pulizie-it",
+  "locale": "it-IT",
+  "currency": "EUR",
+  "title": "Quanto costa una pulizia professionale?",
+  "business": {
+    "name": "La tua impresa di pulizie"
+  },
+  "fields": [
+    {
+      "id": "mq",
+      "type": "number",
+      "label": "Metri quadri da pulire",
+      "unit": "m²",
+      "min": 10,
+      "max": 2000,
+      "step": 5,
+      "default": 80
+    },
+    {
+      "id": "tipo",
+      "type": "choice",
+      "label": "Tipo di pulizia",
+      "options": [
+        {
+          "label": "Ordinaria",
+          "value": 1.5
+        },
+        {
+          "label": "A fondo",
+          "value": 2.5
+        },
+        {
+          "label": "Fine cantiere",
+          "value": 4
+        }
+      ],
+      "default": 0
+    },
+    {
+      "id": "bagni",
+      "type": "number",
+      "label": "Numero di bagni",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "id": "vetri",
+      "type": "toggle",
+      "label": "Pulizia vetri inclusa",
+      "on": 40,
+      "off": 0,
+      "default": false
+    }
+  ],
+  "formula": "max(60, mq * tipo + bagni * 15 + vetri)",
+  "range": {
+    "low": 0.9,
+    "high": 1.15
+  },
+  "rounding": 5,
+  "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+  },
+  "disclaimer": "Stima indicativa, non è un'offerta vincolante. Prezzo finale dopo sopralluogo. Aliquota IVA da confermare.",
+  "branding": true
+}

@@ -1,0 +1,85 @@
+{
+  "v": 1,
+  "id": "painting-en",
+  "locale": "en-IE",
+  "currency": "EUR",
+  "title": "How much does painting a home cost?",
+  "business": {
+    "name": "Your painting company"
+  },
+  "fields": [
+    {
+      "id": "floor_m2",
+      "type": "number",
+      "label": "Floor area",
+      "unit": "m²",
+      "min": 5,
+      "max": 1000,
+      "step": 1,
+      "default": 60
+    },
+    {
+      "id": "ceilings",
+      "type": "choice",
+      "label": "Ceiling height",
+      "options": [
+        {
+          "label": "Up to 2.7 m",
+          "value": 1
+        },
+        {
+          "label": "Over 2.7 m",
+          "value": 1.2
+        }
+      ],
+      "default": 0
+    },
+    {
+      "id": "finish",
+      "type": "choice",
+      "label": "Colour",
+      "options": [
+        {
+          "label": "White",
+          "value": 6
+        },
+        {
+          "label": "Coloured",
+          "value": 8
+        }
+      ],
+      "default": 0
+    },
+    {
+      "id": "furnished",
+      "type": "toggle",
+      "label": "Home is furnished",
+      "on": 1.1,
+      "off": 1,
+      "default": true
+    },
+    {
+      "id": "mould_m2",
+      "type": "number",
+      "label": "Wall area with mould",
+      "unit": "m²",
+      "min": 0,
+      "max": 500,
+      "step": 1,
+      "default": 0
+    }
+  ],
+  "formula": "max(150, (floor_m2 * 3 * finish * ceilings + mould_m2 * 3) * furnished)",
+  "range": {
+    "low": 0.9,
+    "high": 1.2
+  },
+  "rounding": 10,
+  "vat": {
+    "rate": 23,
+    "pricesInclude": false,
+    "show": true
+  },
+  "disclaimer": "Indicative estimate, not a binding offer. Final price after a site visit. VAT rate to be confirmed by the business.",
+  "branding": true
+}

@@ -1,0 +1,85 @@
+{
+  "v": 1,
+  "id": "imbianchino-it",
+  "locale": "it-IT",
+  "currency": "EUR",
+  "title": "Quanto costa imbiancare?",
+  "business": {
+    "name": "La tua impresa di tinteggiatura"
+  },
+  "fields": [
+    {
+      "id": "mq",
+      "type": "number",
+      "label": "Metri quadri di pavimento",
+      "unit": "m²",
+      "min": 5,
+      "max": 1000,
+      "step": 1,
+      "default": 60
+    },
+    {
+      "id": "altezza",
+      "type": "choice",
+      "label": "Altezza soffitti",
+      "options": [
+        {
+          "label": "Fino a 2,70 m",
+          "value": 1
+        },
+        {
+          "label": "Oltre 2,70 m",
+          "value": 1.2
+        }
+      ],
+      "default": 0
+    },
+    {
+      "id": "colore",
+      "type": "choice",
+      "label": "Colore",
+      "options": [
+        {
+          "label": "Bianco",
+          "value": 6
+        },
+        {
+          "label": "Colorato",
+          "value": 8
+        }
+      ],
+      "default": 0
+    },
+    {
+      "id": "arredato",
+      "type": "toggle",
+      "label": "Casa arredata",
+      "on": 1.1,
+      "off": 1,
+      "default": true
+    },
+    {
+      "id": "antimuffa",
+      "type": "number",
+      "label": "m² di pareti con muffa",
+      "unit": "m²",
+      "min": 0,
+      "max": 500,
+      "step": 1,
+      "default": 0
+    }
+  ],
+  "formula": "max(150, (mq * 3 * colore * altezza + antimuffa * 3) * arredato)",
+  "range": {
+    "low": 0.9,
+    "high": 1.2
+  },
+  "rounding": 10,
+  "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+  },
+  "disclaimer": "Stima indicativa, non è un'offerta vincolante. Prezzo finale dopo sopralluogo. Aliquota IVA da confermare.",
+  "branding": true
+}

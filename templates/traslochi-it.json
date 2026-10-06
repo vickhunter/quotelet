@@ -1,0 +1,69 @@
+{
+  "v": 1,
+  "id": "traslochi-it",
+  "locale": "it-IT",
+  "currency": "EUR",
+  "title": "Quanto costa un trasloco?",
+  "business": {
+    "name": "La tua impresa di traslochi"
+  },
+  "fields": [
+    {
+      "id": "stanze",
+      "type": "number",
+      "label": "Numero di stanze",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "id": "km",
+      "type": "number",
+      "label": "Distanza tra le due case",
+      "unit": "km",
+      "min": 0,
+      "max": 1500,
+      "step": 1,
+      "default": 15
+    },
+    {
+      "id": "piano",
+      "type": "number",
+      "label": "Piano più alto (partenza o arrivo)",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "id": "ascensore",
+      "type": "toggle",
+      "label": "Ascensore disponibile",
+      "on": 1,
+      "off": 0,
+      "default": true
+    },
+    {
+      "id": "smontaggio",
+      "type": "toggle",
+      "label": "Smontaggio e montaggio mobili",
+      "on": 150,
+      "off": 0,
+      "default": false
+    }
+  ],
+  "formula": "max(250, stanze * 280 + km * 1.5 + if(ascensore == 1, 0, piano * 40) + smontaggio)",
+  "range": {
+    "low": 0.85,
+    "high": 1.25
+  },
+  "rounding": 10,
+  "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "show": true
+  },
+  "disclaimer": "Stima indicativa, non è un'offerta vincolante. Prezzo finale dopo sopralluogo o videochiamata. Aliquota IVA da confermare.",
+  "branding": true
+}

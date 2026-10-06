@@ -249,3 +249,68 @@ describe("widget", () => {
     expect(typeof (window as any).Quotelet?.mount).toBe("function");
   });
 });
+
+// ---- fix 8: de-CH / fr-CH configs render a German / French widget (no English UI words) ----------
+import { ENGLISH_WORDS } from "../../../apps/web/src/lib/englishWords.ts"; // the repo's EN word list (D-004c scanner), read-only
+import { strings as i18n } from "../../core/src/i18n.ts";
+
+// Words on the EN list that are also correct German or French UI words.
+const ALSO_DE_FR = new Set(["name", "total", "message", "option", "options", "start", "code", "default"]);
+const swissCfg = (lang: "de" | "fr") => ({
+  v: 1, id: `swiss-${lang}`, locale: `${lang}-CH`, currency: "CHF",
+  title: lang === "de" ? "Umzug in Lugano" : "Nettoyage de fin de bail",
+  business: { name: lang === "de" ? "Muster Umzüge" : "Nettoyage Dupont", whatsapp: "41791234567", email: "info@example.ch" },
+  fields: lang === "de"
+    ? [{ id: "volumen", type: "number", label: "Volumen", unit: "m³", min: 1, max: 200, step: 1, default: 20 },
+       { id: "etage", type: "choice", label: "Stockwerk", options: [{ label: "Erdgeschoss", value: 0 }, { label: "3. Stock", value: 3 }], default: 1 },
+       { id: "lift", type: "toggle", label: "Ohne Lift", on: 20, off: 0, default: true }]
+    : [{ id: "pieces", type: "number", label: "Nombre de pièces", min: 1, max: 12, step: 1, default: 3 },
+       { id: "etat", type: "choice", label: "État du logement", options: [{ label: "Bon", value: 1 }, { label: "Très sale", value: 1.5 }], default: 0 },
+       { id: "vitres", type: "toggle", label: "Vitres incluses", on: 80, off: 0, default: true }],
+  formula: lang === "de" ? "max(300, volumen * 45 + etage * 20 + lift)" : "pieces * 180 * etat + vitres",
+  range: { low: 0.9, high: 1.1 }, rounding: 10,
+  vat: { rate: 8.1, pricesInclude: false, show: true },
+});
+const uiText = (el: Element): string[] => {
+  const out: string[] = [];
+  const walk = (n: Node) => {
+    if (n.nodeType === 1) {
+      const e = n as Element;
+      if (e.tagName === "STYLE") return;
+      for (const a of ["placeholder", "aria-label", "title", "alt"]) { const v = e.getAttribute(a); if (v) out.push(v); }
+    }
+    if (n.nodeType === 3 && n.textContent!.trim()) out.push(n.textContent!.trim());
+    n.childNodes.forEach(walk);
+  };
+  walk(el.shadowRoot!);
+  return out;
+};
+
+describe("widget in German and French (de-CH / fr-CH)", () => {
+  for (const lang of ["de", "fr"] as const) {
+    test(`${lang}-CH config: widget text has no English UI words and uses the ${lang} table`, async () => {
+      const el = host({ "data-quotelet": "", "data-config": b64u(JSON.stringify(swissCfg(lang))) });
+      autoMount(document);
+      await tick();
+      expect($(el, "ql-error")).toBeNull();
+      const text = uiText(el);
+      const words = text.join(" ").toLowerCase().split(/[^\p{L}]+/u).filter(Boolean);
+      const english = words.filter((w) => ENGLISH_WORDS.has(w) && !ALSO_DE_FR.has(w));
+      expect({ lang, english }).toEqual({ lang, english: [] });
+      const en = i18n("en"), t = i18n(lang);
+      for (const v of [en.ctaWhatsApp, en.ctaEmail, en.nameLabel, en.poweredBy, en.estimateLabel, en.withVat, en.vatExcluded("8.1")])
+        expect({ lang, v, hit: text.join("\n").includes(v) }).toEqual({ lang, v, hit: false });
+      for (const v of [t.ctaWhatsApp, t.ctaEmail, t.nameLabel, t.poweredBy, t.estimateLabel])
+        expect({ lang, v, shown: text.includes(v) }).toEqual({ lang, v, shown: true });
+      expect($(el, "ql-name")!.getAttribute("placeholder")).toBe(t.namePlaceholder);
+      expect($(el, "ql-vat-note")!.textContent).toContain(t.vatExcluded("8.1"));
+    });
+  }
+
+  test("widget bundle with de + fr tables stays under the 15,360 B gzip budget", () => {
+    const b = readFileSync(BUNDLE, "utf8");
+    expect(b).toContain(i18n("de").ctaShare);
+    expect(b).toContain(i18n("fr").ctaShare);
+    expect(Bun.gzipSync(readFileSync(BUNDLE)).length).toBeLessThanOrEqual(15360);
+  });
+});

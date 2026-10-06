@@ -21,7 +21,8 @@ describe("POST /api/aperto proxy (Web Request -> Response)", () => {
     expect(j.attempts).toBe(1);
     expect(Array.isArray(j.warnings)).toBe(true);
     expect(validateConfig(j.config).ok).toBe(true);
-    expect(Object.keys(j).sort()).toEqual(["attempts", "config", "ok", "warnings"]);
+    expect(j.source).toBe("recording"); // APERTUS_MOCK=1 replays recordings: never labelled "model"
+    expect(Object.keys(j).sort()).toEqual(["attempts", "config", "ok", "source", "warnings"]);
   });
 
   test("config: broken text -> {ok:false, errors:[{path,message}], attempts:2}", async () => {
@@ -38,7 +39,7 @@ describe("POST /api/aperto proxy (Web Request -> Response)", () => {
     const quote = computeQuote(cfg, { volumen: 20, etage_auszug: 3, ohne_lift: true });
     const j: any = await (await mockHandler()(post({ action: "message", config: cfg, quote, lang: "it" }))).json();
     expect(j.ok).toBe(true);
-    expect(["model", "template"]).toContain(j.source);
+    expect(j.source).toBe("recording"); // mock wording is a recording, not a model answer
     expect(j.text).toContain(quote.display.low.replace(/[\u00a0\u202f]/g, " "));
     expect(Object.keys(j).sort()).toEqual(["ok", "source", "text"]);
   });

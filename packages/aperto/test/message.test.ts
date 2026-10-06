@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { computeQuote, type Config } from "../../core/src/index.ts";
 import { draftMessage, checkWording, templateWording } from "../src/message.ts";
 import { recorded, replayClient, rootFixture } from "./helpers.ts";
+import { clientFromEnv, createClient } from "../src/client.ts";
 import type { Lang } from "../src/types.ts";
 
 const SP = /[\u00a0\u202f\u2007]/g;
@@ -108,5 +109,24 @@ describe("draftMessage: model writes wording only; core fills {LOW} {HIGH} {VAT}
     const r = await draftMessage(moverCfg, tampered, "en", { client: replayClient(["Estimate {LOW} - {HIGH}. {VAT}"]) });
     expect(r.text).toContain(norm(moverQuote.display.low));
     expect(r.text).not.toContain("1.00");
+  });
+});
+
+describe("source labels: recordings are never called \"model\"", () => {
+  test("APERTUS_MOCK=1 client -> source \"recording\"", async () => {
+    const client = clientFromEnv({ APERTUS_MOCK: "1" })!;
+    expect(client.recorded).toBe(true);
+    const r = await draftMessage(moverCfg, moverQuote, "it", { client });
+    expect(r.source).toBe("recording");
+  });
+  test("mock mode, unusable wording -> template fallback still says \"template\"", async () => {
+    const bad = async () => Response.json({ choices: [{ message: { content: "Costa 999 franchi, vedi https://x.example" } }] });
+    const client = createClient({ baseUrl: "http://mock.invalid/v1", model: "apertus-mock", fetch: bad, recorded: true });
+    const r = await draftMessage(moverCfg, moverQuote, "it", { client });
+    expect(r.source).toBe("template");
+  });
+  test("real (non-recorded) client -> source \"model\"", async () => {
+    const client = replayClient(["Buongiorno, la stima è tra {LOW} e {HIGH}. {VAT}"]);
+    expect((await draftMessage(moverCfg, moverQuote, "it", { client })).source).toBe("model");
   });
 });

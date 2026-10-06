@@ -28,11 +28,11 @@ describe("Vercel pre-bundle (api/aperto.mjs)", () => {
       const m = await (await post({ action: "message", config: c.config, quote, lang: "it" })).json();
       const big = (await post("x".repeat(5000))).status;
       const foreign = (await post({ action: "config", text: "x", lang: "de" }, { origin: "https://evil.example" })).status;
-      console.log(JSON.stringify({ ok: c.ok, fields: c.config?.fields?.length, mok: m.ok, text: m.text, big, foreign }));`;
+      console.log(JSON.stringify({ ok: c.ok, fields: c.config?.fields?.length, csource: c.source, mok: m.ok, msource: m.source, text: m.text, big, foreign }));`;
     const r = spawnSync("node", ["--input-type=module", "-e", script], { encoding: "utf8", timeout: 20000, env: { ...process.env, APERTUS_MOCK: "1", APERTUS_BASE_URL: "", APERTUS_MODEL: "" } });
     expect(r.stderr).toBe("");
     const j = JSON.parse(r.stdout.trim());
-    expect(j).toMatchObject({ ok: true, fields: 4, mok: true, big: 413, foreign: 403 });
+    expect(j).toMatchObject({ ok: true, fields: 4, csource: "recording", mok: true, msource: "recording", big: 413, foreign: 403 });
     expect(j.text).toContain("CHF 860.00");
     expect(j.text).toContain("CHF 1\u2019060.00"); // U+2019 under Node too (core formatMoney)
     expect(j.text).not.toContain("1'060");

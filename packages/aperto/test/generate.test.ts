@@ -3,6 +3,7 @@ import { computeQuote, validateConfig } from "../../core/src/index.ts";
 import { generateConfig, buildConfigMessages } from "../src/generate.ts";
 import { EXAMPLES } from "../src/examples.ts";
 import { recorded, replayClient } from "./helpers.ts";
+import { clientFromEnv } from "../src/client.ts";
 
 const demo = recorded("recorded-demo.json") as { id: string; lang: any; text: string; responses: string[] }[];
 const rec = (id: string) => demo.find((d) => d.id === id)!;
@@ -122,5 +123,14 @@ describe("generateConfig: prompt -> config v1 -> validateConfig + compileFormula
 
   test("every canonical example has a recorded answer", () => {
     for (const ex of EXAMPLES) expect(demo.some((d) => d.text === ex.text && d.lang === ex.lang)).toBe(true);
+  });
+});
+
+describe("generateConfig source label (additive)", () => {
+  test("APERTUS_MOCK=1 -> source \"recording\"; real client -> \"model\"", async () => {
+    const m = await generateConfig(mover.text, "de", { client: clientFromEnv({ APERTUS_MOCK: "1" })! });
+    expect(m.ok && m.source).toBe("recording");
+    const r = await generateConfig(mover.text, "de", { client: replayClient(mover.responses) });
+    expect(r.ok && r.source).toBe("model");
   });
 });

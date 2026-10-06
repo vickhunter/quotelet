@@ -120,3 +120,15 @@ harness http://127.0.0.1:4173 · chromium 153.0.8010.12 · dist/quotelet.js 2665
   PASS [5] valid base64 of non-JSON: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
   PASS [5] prototype pollution JSON: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
 SUMMARY sim:d003 personas 4/4 passed (P1 PASS, P3 PASS, P4 PASS, P5 PASS); checks 28/28 passed
+2026-10-06T06:59:00.229Z [d004] giulia-q: actions=5 low="1780,00 €" high="2380,00 €" PASS
+2026-10-06T06:59:03.246Z [d004] marco: link=http://127.0.0.1:4173/q#c=eyJ2IjoxLCJpZCI6ImltYmlhbmNoaW5vLW… PASS
+2026-10-06T06:59:03.991Z [d004] giulia-on-marco-link: actions=5 low="1780,00 €" high="2380,00 €" PASS
+2026-10-06T06:59:04.049Z [d004] PASS persona 1 Giulia /q
+2026-10-06T06:59:04.049Z [d004] PASS persona 2 Marco /build
+2026-10-06T06:59:04.049Z [d004] sim:d004 PASSED
+2026-10-06T07:34:35.346Z [d004] giulia-q: actions=5 low="1780,00 €" high="2380,00 €" PASS
+2026-10-06T07:34:38.330Z [d004] marco: link=http://127.0.0.1:4173/q#c=eyJ2IjoxLCJpZCI6ImltYmlhbmNoaW5vLW… PASS
+2026-10-06T07:34:39.018Z [d004] giulia-on-marco-link: actions=5 low="1780,00 €" high="2380,00 €" PASS
+2026-10-06T07:34:39.037Z [d004] PASS persona 1 Giulia /q
+2026-10-06T07:34:39.037Z [d004] PASS persona 2 Marco /build
+2026-10-06T07:34:39.037Z [d004] sim:d004 PASSED

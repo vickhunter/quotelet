@@ -1,0 +1,19 @@
+.it { padding: 32px 0 40px; }
+.it-grid { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 24px 56px; align-items: start; grid-template-areas: "head widget" "explainer widget" "pro widget" "waitlist ."; }
+.it-head { grid-area: head; display: grid; gap: 16px; }
+.it-head h1 { font-size: clamp(32px, 4.6vw, 54px); }
+.it-head .lede { font-size: 19px; color: var(--ink-2); max-width: 44ch; }
+.it-widget { grid-area: widget; position: sticky; top: 84px; }
+.it-explainer { grid-area: explainer; display: grid; gap: 12px; max-width: 62ch; }
+.it-explainer h2, .it-waitlist h2 { font-size: 26px; }
+.it-explainer .note { font-size: 14px; color: var(--ink-3); }
+.pro-box { grid-area: pro; display: grid; gap: 12px; justify-items: start; padding: 26px; border-radius: var(--radius); background: var(--ink); color: var(--paper); }
+.pro-box h2 { font-size: 28px; }
+.pro-box p { color: #D8D0BF; max-width: 46ch; }
+.pro-box .btn-primary { background: var(--accent); color: #fff; }
+.pro-box .btn-primary:hover { background: var(--accent-ink); }
+.it-waitlist { grid-area: waitlist; display: grid; gap: 10px; }
+@media (max-width: 960px) {
+  .it-grid { grid-template-columns: 1fr; grid-template-areas: "head" "widget" "explainer" "pro" "waitlist"; gap: 28px; }
+  .it-widget { position: static; }
+}

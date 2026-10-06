@@ -1,0 +1,7 @@
+.share-page { min-height: 100dvh; display: grid; align-content: start; justify-items: center; gap: 20px; padding: max(20px, env(safe-area-inset-top)) 16px 32px; }
+.share-widget { width: 100%; max-width: 520px; }
+@media (min-width: 700px) { .share-page { align-content: center; padding-top: 48px; } }
+.share-empty { display: grid; gap: 12px; justify-items: center; text-align: center; max-width: 380px; padding-top: 18vh; }
+.share-empty h1 { font-size: 28px; }
+.share-foot { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+.share-foot:hover { color: var(--ink); }

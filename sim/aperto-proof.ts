@@ -10,6 +10,19 @@ import { EXAMPLES } from '../packages/aperto/src/examples.ts'
 
 const BASE = process.env.QL_BASE ?? 'http://127.0.0.1:4173'
 const OUT = 'proof'
+// SHARE_ORIGIN=https://<preview>: shots open the pages at that origin and every request to it is served
+// by the local build at BASE (same dist as the preview, recorded answers), so the share link and embed
+// code show the preview URL instead of 127.0.0.1. Used because the preview sits behind Vercel protection.
+const ORIGIN = (process.env.SHARE_ORIGIN ?? BASE).replace(/\/$/, '')
+async function mapOrigin(ctx: BrowserContext) {
+  if (ORIGIN === BASE) return
+  await ctx.route(`${ORIGIN}/**`, async (r) => {
+    const headers = { ...r.request().headers() }
+    if (headers.origin) headers.origin = BASE
+    const res = await r.fetch({ url: r.request().url().replace(ORIGIN, BASE), headers })
+    await r.fulfill({ response: res })
+  })
+}
 const RAW = process.env.RAW ?? '/tmp/quotelet-aperto-demo.raw.webm'
 const MOVER = 'mover-lugano'
 const BROKEN = 'Gardening: 50 per hour, a bit more on Sundays'
@@ -20,8 +33,8 @@ const preview = (p: Page) => tid(p, 'aperto-preview')
 const widget = (p: Page) => tid(p, 'share-widget')
 const overflow = (p: Page) => p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
 
-async function freshAperto(p: Page) {
-  await p.goto(`${BASE}/aperto`)
+async function freshAperto(p: Page, base = BASE) {
+  await p.goto(`${base}/aperto`)
   await p.evaluate(() => localStorage.removeItem('quotelet:aperto-draft'))
   await p.reload()
   await tid(p, 'aperto-text').waitFor()
@@ -48,8 +61,9 @@ async function shots() {
   try {
     for (const [w, h] of [[375, 812], [1440, 900]]) {
       const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: w === 375 ? 2 : 1 })
+      await mapOrigin(ctx)
       const p = await ctx.newPage()
-      await freshAperto(p)
+      await freshAperto(p, ORIGIN)
       await makeMover(p)
       await settle(p)
       await p.screenshot({ path: `${OUT}/aperto-page-${w}.png`, fullPage: true })
@@ -58,7 +72,8 @@ async function shots() {
       await customerItalian(p, link)
       await settle(p)
       await p.screenshot({ path: `${OUT}/aperto-q-${w}.png`, fullPage: true })
-      console.log(`shots ${w}: /aperto overflow ${ox}px, /q overflow ${await overflow(p)}px`)
+      const demo = await tid(p, 'msg-demo').count()
+      console.log(`shots ${w}: link ${link.slice(0, 60)}…, /aperto overflow ${ox}px, /q overflow ${await overflow(p)}px, /q demo label ${demo}`)
       await ctx.close()
     }
     // Cover: 1600x900 CSS px rendered at 0.8x, so the PNG is 1280x720 and shows form, validator and preview.

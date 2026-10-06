@@ -1,0 +1,80 @@
+
+=== sim:d003 2026-10-06T06:55:09.464Z (local 06/10/2026, 08:55:09 Europe/Rome) ===
+harness http://127.0.0.1:4173 · chromium 153.0.8010.12 · dist/quotelet.js 26118 B, gzip 9785 B (budget 15360 B)
+- Persona 1: Giulia, homeowner in Bologna, phone 375x812 (harness/share.html via /q)
+  PASS [1] cents match @quotelet/core — browser {"low":178000,"high":238000,"lowGross":217160,"highGross":290360} vs core {"low":178000,"high":238000,"lowGross":217160,"highGross":290360}
+  PASS [1] WhatsApp handoff intercepted, wa.me URL + text match core — https://wa.me/393331234567?text=Ciao%20Rossi%20Tinteggiature…
+  PASS [1] message has business, 5 answer lines, range, VAT note, name
+  PASS [1] zero non-GET or third-party requests — 5 requests, all GET same-origin
+  PASS [1] no console errors / page errors
+  PASS [1] <= 8 actions — 5 actions, 342 ms
+  PASS [1] lead event carries no PII
+  PASS [1] no cookies / storage written
+- Persona 3: Sara, freelance web designer (embed snippet on plain.html + hostile.html, two widgets)
+  FAIL [sara] journey completed — Error: page.evaluate: ReferenceError: __name is not defined
+    at eval (eval at evaluate (:311:30), <anonymous>:1:17)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+- Persona 4: Alex, dev from HN (README quickstart: templates → validate → quote --json → link → open)
+  PASS [4] README has a quickstart block — 5 commands
+    $ bun install   (skipped: already installed by the harness run)
+    $ bun packages/cli/index.ts templates -> exit 0
+    $ bun packages/cli/index.ts validate templates/imbianchino-it.json -> exit 0
+    $ bun packages/cli/index.ts quote templates/imbianchino-it.json --set mq=80 --json -> exit 0
+    $ bun packages/cli/index.ts link templates/imbianchino-it.json --base http://127.0.0.1:4173 -> exit 0
+  PASS [4] every command exits 0
+  PASS [4] quote --json parses — low 142000 high 191000 cents
+  PASS [4] link prints <base>/q#c=… — http://127.0.0.1:4173/q#c=eyJ2IjoxLCJpZCI6ImltYmlhbmNoaW5vLW…
+  PASS [4] opened link shows the calculator; mq=80 matches the CLI quote — widget high 191000 vs CLI 191000
+  PASS [4] start to finish < 2 min — 0.3 s (CLI 0.1 s)
+- Persona 5: Mallory, hostile config author (injection formula, XSS label, 50 KB config, garbage base64)
+    50 KB case: fragment 70638 chars
+  PASS [5] injection formula: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] XSS label + script title: renders as literal text; no dialog/script; host alive; no throw — error=false calc=true injected=0 dialogs=0 pageErrors=0
+  PASS [5] 50 KB config: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] garbage base64: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] valid base64 of non-JSON: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] prototype pollution JSON: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+SUMMARY sim:d003 personas 3/4 passed (P1 PASS, Psara FAIL, P4 PASS, P5 PASS); checks 20/21 passed
+
+=== sim:d003 2026-10-06T06:55:19.844Z (local 06/10/2026, 08:55:19 Europe/Rome) ===
+harness http://127.0.0.1:4173 · chromium 153.0.8010.12 · dist/quotelet.js 26118 B, gzip 9785 B (budget 15360 B)
+- Persona 1: Giulia, homeowner in Bologna, phone 375x812 (harness/share.html via /q)
+  PASS [1] cents match @quotelet/core — browser {"low":178000,"high":238000,"lowGross":217160,"highGross":290360} vs core {"low":178000,"high":238000,"lowGross":217160,"highGross":290360}
+  PASS [1] WhatsApp handoff intercepted, wa.me URL + text match core — https://wa.me/393331234567?text=Ciao%20Rossi%20Tinteggiature…
+  PASS [1] message has business, 5 answer lines, range, VAT note, name
+  PASS [1] zero non-GET or third-party requests — 5 requests, all GET same-origin
+  PASS [1] no console errors / page errors
+  PASS [1] <= 8 actions — 5 actions, 348 ms
+  PASS [1] lead event carries no PII
+  PASS [1] no cookies / storage written
+- Persona 3: Sara, freelance web designer (embed snippet on plain.html + hostile.html, two widgets)
+  PASS [3] plain.html: both widgets mount and fire quotelet:ready — w1:imbianchino-it, w2:painting-en
+  PASS [3] plain.html: no page errors, host script ran
+  PASS [3] hostile.html: both widgets mount and fire quotelet:ready — w1:imbianchino-it, w2:painting-en
+  PASS [3] widgets are independent (w1 changes, w2 untouched) — w1 143000→286000, w2 143000→143000
+  PASS [3] quotelet:quote fires on the changed widget only — quotelet:quote@w1
+  PASS [3] hostile.html: no page errors, host script ran
+  PASS [3] Shadow DOM isolation: computed styles identical on plain vs hostile host — host * {font-size:40px!important;color:red!important} etc. had no effect
+  PASS [3] bundle <= 15 KB gzip — 9735 B gzip
+- Persona 4: Alex, dev from HN (README quickstart: templates → validate → quote --json → link → open)
+  PASS [4] README has a quickstart block — 5 commands
+    $ bun install   (skipped: already installed by the harness run)
+    $ bun packages/cli/index.ts templates -> exit 0
+    $ bun packages/cli/index.ts validate templates/imbianchino-it.json -> exit 0
+    $ bun packages/cli/index.ts quote templates/imbianchino-it.json --set mq=80 --json -> exit 0
+    $ bun packages/cli/index.ts link templates/imbianchino-it.json --base http://127.0.0.1:4173 -> exit 0
+  PASS [4] every command exits 0
+  PASS [4] quote --json parses — low 142000 high 191000 cents
+  PASS [4] link prints <base>/q#c=… — http://127.0.0.1:4173/q#c=eyJ2IjoxLCJpZCI6ImltYmlhbmNoaW5vLW…
+  PASS [4] opened link shows the calculator; mq=80 matches the CLI quote — widget high 191000 vs CLI 191000
+  PASS [4] start to finish < 2 min — 0.3 s (CLI 0.1 s)
+- Persona 5: Mallory, hostile config author (injection formula, XSS label, 50 KB config, garbage base64)
+    50 KB case: fragment 70638 chars
+  PASS [5] injection formula: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] XSS label + script title: renders as literal text; no dialog/script; host alive; no throw — error=false calc=true injected=0 dialogs=0 pageErrors=0
+  PASS [5] 50 KB config: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] garbage base64: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] valid base64 of non-JSON: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+  PASS [5] prototype pollution JSON: ql-error shown; no dialog/script; host alive; no throw — error=true calc=false injected=0 dialogs=0 pageErrors=0
+SUMMARY sim:d003 personas 4/4 passed (P1 PASS, P3 PASS, P4 PASS, P5 PASS); checks 28/28 passed

@@ -1,0 +1,10 @@
+{
+  "name": "@quotelet/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Quotelet CLI: templates | validate | quote | link",
+  "license": "MIT",
+  "bin": { "quotelet": "./index.ts" },
+  "dependencies": { "@quotelet/core": "workspace:*" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@quotelet/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Quotelet engine: config v1 schema, safe formula language, quote math, WhatsApp/mailto handoff, base64url encoding. Pure TS, no DOM, zero runtime deps.",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": { ".": "./src/index.ts", "./*": "./src/*.ts" }
+}

@@ -1,0 +1,54 @@
+{
+  "input": {
+    "mq": 60,
+    "altezza": 0,
+    "colore": 0,
+    "arredato": true,
+    "antimuffa": 0
+  },
+  "pointCents": 118800,
+  "lowCents": 106000,
+  "highCents": 143000,
+  "currency": "EUR",
+  "vat": {
+    "rate": 22,
+    "pricesInclude": false,
+    "lowGrossCents": 129320,
+    "highGrossCents": 174460
+  },
+  "display": {
+    "low": "1060,00 €",
+    "high": "1430,00 €",
+    "vatNote": "Prezzi IVA esclusa (22%)",
+    "lowGross": "1293,20 €",
+    "highGross": "1744,60 €"
+  },
+  "answers": [
+    {
+      "id": "mq",
+      "label": "Metri quadri di pavimento",
+      "display": "60 m²"
+    },
+    {
+      "id": "altezza",
+      "label": "Altezza soffitti",
+      "display": "Fino a 2,70 m"
+    },
+    {
+      "id": "colore",
+      "label": "Colore",
+      "display": "Bianco"
+    },
+    {
+      "id": "arredato",
+      "label": "Casa arredata",
+      "display": "Sì"
+    },
+    {
+      "id": "antimuffa",
+      "label": "m² di pareti con muffa",
+      "display": "0 m²"
+    }
+  ],
+  "error": null
+}

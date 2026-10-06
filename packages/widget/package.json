@@ -1,0 +1,10 @@
+{
+  "name": "@quotelet/widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Embeddable Quotelet widget (vanilla DOM + Shadow DOM) bundled to dist/quotelet.js",
+  "license": "MIT",
+  "scripts": { "build": "bun build.ts" },
+  "dependencies": { "@quotelet/core": "workspace:*" }
+}

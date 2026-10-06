@@ -55,7 +55,7 @@ describe("i18n strings: it / en / de / fr", () => {
     for (const l of ["de", "de-CH", "de-DE", "de-AT", "DE-ch"]) expect(strings(l)).toBe(de);
     for (const l of ["fr", "fr-CH", "fr-FR", "FR-ch"]) expect(strings(l)).toBe(fr);
     for (const l of ["it", "it-IT", "it-CH"]) expect(strings(l)).toBe(it);
-    for (const l of ["en", "en-US", "es-ES", "pt", "", undefined, null]) expect(strings(l as any)).toBe(en);
+    for (const l of ["en", "en-US", "es-ES", "pt", "", undefined, null, "constructor", "__proto__-CH", "toString"]) expect(strings(l as any)).toBe(en);
     expect(it.yes).toBe("S\u00ec");
   });
 });

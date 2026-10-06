@@ -253,6 +253,7 @@ describe("widget", () => {
 // ---- fix 8: de-CH / fr-CH configs render a German / French widget (no English UI words) ----------
 import { ENGLISH_WORDS } from "../../../apps/web/src/lib/englishWords.ts"; // the repo's EN word list (D-004c scanner), read-only
 import { strings as i18n } from "../../core/src/i18n.ts";
+import { formatNumber } from "../../core/src/quote.ts";
 
 // Words on the EN list that are also correct German or French UI words.
 const ALSO_DE_FR = new Set(["name", "total", "message", "option", "options", "start", "code", "default"]);
@@ -303,7 +304,7 @@ describe("widget in German and French (de-CH / fr-CH)", () => {
       for (const v of [t.ctaWhatsApp, t.ctaEmail, t.nameLabel, t.poweredBy, t.estimateLabel])
         expect({ lang, v, shown: text.includes(v) }).toEqual({ lang, v, shown: true });
       expect($(el, "ql-name")!.getAttribute("placeholder")).toBe(t.namePlaceholder);
-      expect($(el, "ql-vat-note")!.textContent).toContain(t.vatExcluded("8.1"));
+      expect($(el, "ql-vat-note")!.textContent).toContain(t.vatExcluded(formatNumber(8.1, `${lang}-CH`))); // fr-CH: "8,1"
     });
   }
 

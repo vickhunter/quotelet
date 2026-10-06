@@ -60,9 +60,16 @@ async function post(payload: unknown, opts: Opts): Promise<Raw> {
   }
 }
 
-const fail = (path: string, message: string, attempts = 0): ConfigResponse => ({ ok: false, errors: [{ path, message }], attempts })
+/** Where an answer came from. "recording" = APERTUS_MOCK replayed a recorded answer (demo); a missing source is live. */
+export type ApertoSource = 'model' | 'template' | 'recording'
+export type ConfigResult = ConfigResponse & { source?: 'model' | 'recording' }
+export type MessageResult = { ok: true; text: string; source: ApertoSource } | { ok: false; errors: ApiError[] }
+/** True only for a successful answer the server marked as a recording (mock mode). */
+export const isRecording = (r: { ok: boolean; source?: unknown } | null | undefined) => !!r && r.ok && r.source === 'recording'
 
-export async function requestConfig(text: string, lang: Lang, opts: Opts = {}): Promise<ConfigResponse> {
+const fail = (path: string, message: string, attempts = 0): ConfigResult => ({ ok: false, errors: [{ path, message }], attempts })
+
+export async function requestConfig(text: string, lang: Lang, opts: Opts = {}): Promise<ConfigResult> {
   const t = text.trim()
   if (!t) return fail('text', 'Write your prices first.')
   const payload = { action: 'config' as const, text: t, lang }
@@ -71,19 +78,22 @@ export async function requestConfig(text: string, lang: Lang, opts: Opts = {}): 
   if (r.kind === 'down') return fail('network', r.error)
   if (r.status === 429) return fail('request', `Too many tries. Wait ${r.retryAfter ?? '60'} s and try again.`)
   const b = r.body
-  if (b?.ok === true && b.config) return { ok: true, config: b.config, attempts: Number(b.attempts) || 1, warnings: Array.isArray(b.warnings) ? b.warnings : [] }
+  if (b?.ok === true && b.config) {
+    const source = b.source === 'recording' || b.source === 'model' ? { source: b.source as 'model' | 'recording' } : {}
+    return { ok: true, config: b.config, attempts: Number(b.attempts) || 1, warnings: Array.isArray(b.warnings) ? b.warnings : [], ...source }
+  }
   if (b?.ok === false && Array.isArray(b.errors) && b.errors.length) return { ok: false, errors: b.errors, attempts: Number(b.attempts) || 0 }
   return fail('request', `The server answered ${r.status || 'nothing'} without a result. Try again.`)
 }
 
-export async function requestMessage(config: Config, quote: Quote, lang: Lang, opts: Opts = {}): Promise<MessageResponse> {
+export async function requestMessage(config: Config, quote: Quote, lang: Lang, opts: Opts = {}): Promise<MessageResult> {
   let payload: any = { action: 'message', config, quote, lang }
   // The server reads only the cents; drop display strings if a large config would pass 4 KB.
   if (bytes(JSON.stringify(payload)) > MAX_BODY) payload = { ...payload, quote: { ...quote, answers: [], display: { low: '', high: '', vatNote: '', lowGross: '', highGross: '' } } }
   if (bytes(JSON.stringify(payload)) > MAX_BODY) return { ok: false, errors: [{ path: 'request', message: 'config too large for the message service' }] }
   const r = await post(payload, opts)
   if (r.kind === 'down') return { ok: false, errors: [{ path: 'network', message: r.error }] }
-  if (r.status === 200 && r.body?.ok === true && typeof r.body.text === 'string' && r.body.text.trim()) return { ok: true, text: r.body.text, source: r.body.source === 'model' ? 'model' : 'template' }
+  if (r.status === 200 && r.body?.ok === true && typeof r.body.text === 'string' && r.body.text.trim()) return { ok: true, text: r.body.text, source: r.body.source === 'model' || r.body.source === 'recording' ? r.body.source : 'template' }
   return { ok: false, errors: Array.isArray(r.body?.errors) ? r.body.errors : [{ path: 'request', message: `HTTP ${r.status}` }] }
 }
 

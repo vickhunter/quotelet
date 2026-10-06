@@ -5,13 +5,13 @@ import { cleanLeadName } from '@quotelet/core/handoff'
 import type { Config, Quote } from '@quotelet/core/types'
 import { QuoteWidget } from '../components/QuoteWidget'
 import { LangPicker } from '../components/LangPicker'
-import { LANGS, leadText, messageKey, requestMessage, waUrl, type Lang } from '../lib/aperto'
+import { LANGS, isRecording, leadText, messageKey, requestMessage, waUrl, type Lang } from '../lib/aperto'
 import { loadUiLang, translator, uiLangOfLocale, type T } from '../lib/i18n'
 import { useMeta } from '../lib/useMeta'
 import './share.css'
 
 const readHash = () => new URLSearchParams(window.location.hash.slice(1)).get('c') ?? ''
-type Msg = { key: string; lang: Lang; status: 'loading' | 'ready' | 'fallback'; text?: string }
+type Msg = { key: string; lang: Lang; status: 'loading' | 'ready' | 'fallback'; text?: string; demo?: boolean }
 
 /** /q#c=<base64url config>. The config lives in the fragment, so it never reaches a server. */
 export function Share() {
@@ -65,7 +65,7 @@ function SharedCalculator({ config, encoded, tr }: { config: Config; encoded: st
     const t = window.setTimeout(async () => {
       try {
         const r = await requestMessage(config, quote, lang, { signal: ac.signal })
-        if (!ac.signal.aborted) setMsg(r.ok ? { key, lang, status: 'ready', text: r.text } : { key, lang, status: 'fallback' })
+        if (!ac.signal.aborted) setMsg(r.ok ? { key, lang, status: 'ready', text: r.text, demo: isRecording(r) } : { key, lang, status: 'fallback' })
       } catch { /* aborted */ }
     }, 500) // debounce: the proxy allows about 10 calls per minute per IP
     return () => { ac.abort(); window.clearTimeout(t) }
@@ -107,6 +107,7 @@ function SharedCalculator({ config, encoded, tr }: { config: Config; encoded: st
               : <span className="hint"><span className="spinner" aria-hidden /> {tr('q.writing')}</span>}
           </div>
         )}
+        {lang && current?.status === 'ready' && current.demo && <p className="demo-tag" data-testid="msg-demo">{tr('demo.recorded')}</p>}
       </section>
     </div>
   )

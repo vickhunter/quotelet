@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { LIMITS, encodeConfig, validateConfig } from '@quotelet/core'
 import type { Config } from '@quotelet/core/types'
-import { APERTO_EXAMPLES, isLang, loadApertoDraft, requestConfig, saveApertoDraft, summarizeConfig, type Lang } from '../lib/aperto'
+import { APERTO_EXAMPLES, isLang, isRecording, loadApertoDraft, requestConfig, saveApertoDraft, summarizeConfig, type Lang } from '../lib/aperto'
 import { embedSnippet, shareLink } from '../lib/share'
 import { useCopy } from '../lib/useCopy'
 import { useMeta } from '../lib/useMeta'
@@ -12,6 +12,7 @@ import { ValidatorPanel, type ValidatorState } from '../components/ValidatorPane
 import { Phone, SiteHeader } from '../components/Chrome'
 import './build.css'
 import './aperto.css'
+import { EN } from '../lib/i18n'
 
 const MAX = 3000
 
@@ -29,6 +30,7 @@ export function Aperto() {
   const [lang, setLang] = useState<Lang>(draft.lang)
   const [status, setStatus] = useState<ValidatorState>({ kind: 'idle' })
   const [config, setConfig] = useState<Config | null>(null)
+  const [demo, setDemo] = useState(false) // the API answered from recordings (APERTUS_MOCK)
   const panel = useRef<HTMLDivElement>(null)
   const textarea = useRef<HTMLTextAreaElement>(null)
   const inflight = useRef<AbortController | null>(null)
@@ -58,6 +60,7 @@ export function Aperto() {
     try {
       const r = await requestConfig(text, lang, { signal: ac.signal })
       if (ac.signal.aborted) return
+      if (r.ok) setDemo(isRecording(r))
       // Defense in depth: the server already validated, but the browser never renders an unchecked config.
       const checked = r.ok ? validateConfig(r.config) : null
       if (r.ok && checked?.ok) {
@@ -126,6 +129,7 @@ export function Aperto() {
         <aside className="aperto-side" aria-label="Result">
           {config ? (
             <>
+              {demo && <p className="demo-tag" data-testid="aperto-demo">{EN['demo.recorded']}</p>}
               <Phone label="Live preview">
                 <QuoteWidget config={config} testId="aperto-preview" />
               </Phone>

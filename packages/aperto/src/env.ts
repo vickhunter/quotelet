@@ -2,9 +2,11 @@
 // overrides variables already set in the real environment.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 export type Env = Record<string, string | undefined>;
-export const REPO_ROOT = join(import.meta.dir, "..", "..", "..");
+/** Repo root (works under Bun and Node: no import.meta.dir). */
+export const REPO_ROOT = fileURLToPath(new URL("../../../", import.meta.url)).replace(/\/$/, "");
 
 export function loadEnvLocal(dir: string = REPO_ROOT, env: Env = process.env): Env {
   const file = join(dir, ".env.local");

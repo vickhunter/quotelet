@@ -4,11 +4,12 @@
 // text -> HTTP 404 (code mock_no_recording). Message requests get a fixed per-language wording.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { CONFIG_MARKER, MESSAGE_MARKER } from "./prompt.ts";
 import type { FetchLike, Lang, Usage } from "./types.ts";
 
 type Recording = { responses: string[]; usage?: Usage[]; latencyMs?: number[] };
-const PKG = join(import.meta.dir, "..");
+const PKG = fileURLToPath(new URL("../", import.meta.url));
 export const normText = (s: string) => s.normalize("NFC").toLowerCase().replace(/\s+/g, " ").replace(/[\s.!]+$/, "").trim();
 
 let cache: Map<string, Recording> | null = null;

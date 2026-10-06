@@ -1,14 +1,17 @@
 // Local static server for the built site on 127.0.0.1:4173 with SPA fallback. Usage: bun run build && bun run serve
 import { existsSync, statSync } from 'node:fs'
 import { join, normalize } from 'node:path'
+import { APERTO_PATH, localApertoHandler } from '../packages/aperto/src/local.ts'
 
 const ROOT = join(import.meta.dir, '..', 'apps/web/dist')
 const port = Number(process.env.PORT ?? 4173)
+const aperto = localApertoHandler() // H-01: POST /api/aperto (APERTUS_MOCK=1 = recorded answers, no key)
 
 Bun.serve({
   hostname: '127.0.0.1',
   port,
   fetch(req) {
+    if (new URL(req.url).pathname === APERTO_PATH) return aperto(req)
     const path = normalize(decodeURIComponent(new URL(req.url).pathname)).replace(/^(\.\.[/\\])+/, '')
     let file = join(ROOT, path)
     if (!file.startsWith(ROOT)) return new Response('Forbidden', { status: 403 })

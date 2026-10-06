@@ -1,10 +1,11 @@
 // Local static server for the D-003 harness (BDD + sims). node:http so it runs under Bun and Node.
 // Routes: /quotelet.js -> dist/quotelet.js, /harness/*, /fixtures/*, /templates/*, and /q -> the
-// harness share page (the real /q page is D-004's apps/web). Binds 127.0.0.1 only.
+// harness share page (the real /q page is D-004's apps/web), POST /api/aperto (H-01). Binds 127.0.0.1 only.
 import { createServer, type Server } from "node:http";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { APERTO_PATH, nodeAperto } from "../packages/aperto/src/local.ts";
 
 export const ROOT = resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const TYPES: Record<string, string> = {
@@ -31,9 +32,12 @@ export function resolvePath(pathname: string): string | null {
 
 export function startServer(opts: { port?: number; host?: string } = {}): Promise<{ server: Server; url: string; close(): Promise<void> }> {
   const host = opts.host ?? "127.0.0.1";
+  const aperto = nodeAperto();
   const server = createServer((req, res) => {
     try {
       const u = new URL(req.url ?? "/", "http://x");
+      // H-01: POST /api/aperto (Apertus proxy; APERTUS_MOCK=1 = recorded answers, no key).
+      if (u.pathname === APERTO_PATH) { aperto(req, res).catch(() => { if (!res.headersSent) res.writeHead(500).end(); }); return; }
       if (req.method !== "GET" && req.method !== "HEAD") { res.writeHead(405, { allow: "GET, HEAD" }).end(); return; }
       const file = resolvePath(u.pathname);
       if (!file) { res.writeHead(404, { "content-type": "text/plain" }).end("not found"); return; }

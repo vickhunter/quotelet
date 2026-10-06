@@ -78,7 +78,8 @@ When('the painter types the WhatsApp number {string}', async function (this: Wor
 Then('the WhatsApp error reads {string}', async function (this: World, text: string) {
   const err = tid(await painter(this), 'whatsapp-error')
   await err.waitFor()
-  assert.match((await err.textContent()) ?? '', new RegExp(text))
+  // Literal match: the message may contain + (e.g. "+39"), which is a regex metacharacter.
+  assert.equal((await err.textContent()) ?? '', text)
 })
 
 When('the painter writes the formula {string}', async function (this: World, src: string) {

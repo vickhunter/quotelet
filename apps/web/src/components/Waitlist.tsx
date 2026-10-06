@@ -1,16 +1,20 @@
 import { useState } from 'react'
-import { submitWaitlist } from '../lib/waitlist'
+import { readRef, submitWaitlist } from '../lib/waitlist'
 
 const copy = {
   en: { label: 'Email', placeholder: 'you@company.com', cta: 'Get notified', sending: 'Saving…', done: "You're on the list. One email when it ships." },
   it: { label: 'Email', placeholder: 'tu@impresa.it', cta: 'Avvisami', sending: 'Salvo…', done: 'Fatto. Ti scriviamo una volta, quando è pronto.' },
 }
 
+/** sessionStorage can throw on access (sandboxed frames, blocked storage). */
+const session = () => { try { return window.sessionStorage } catch { return undefined } }
+
 export function Waitlist({ locale = 'en', source }: { locale?: 'en' | 'it'; source: string }) {
   const t = copy[locale]
   const [email, setEmail] = useState('')
   const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [ref] = useState(() => (typeof window === 'undefined' ? '' : readRef(window.location.search, session())))
 
   if (state === 'done')
     return (
@@ -30,12 +34,13 @@ export function Waitlist({ locale = 'en', source }: { locale?: 'en' | 'it'; sour
       onSubmit={async (e) => {
         e.preventDefault()
         setState('sending')
-        const r = await submitWaitlist(email, source)
+        const r = await submitWaitlist(email, source, { ref })
         if (r.ok) return setState('done')
         setState('idle')
         setError(locale === 'it' ? (r.error.startsWith('Check') ? "Controlla l'indirizzo email." : 'Non è andata. Riprova tra un minuto.') : r.error)
       }}
     >
+      <input type="hidden" name="ref" value={ref} data-testid="waitlist-ref" />
       <label className="sr-only" htmlFor={`wl-${source}`}>{t.label}</label>
       <input
         id={`wl-${source}`}

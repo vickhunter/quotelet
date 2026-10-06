@@ -71,7 +71,7 @@ describe('security headers', () => {
   test('app pages get a strict CSP with frame-ancestors none', () => {
     const csp = headersFor('/')['Content-Security-Policy']
     for (const d of ["default-src 'self'", "script-src 'self'", "connect-src 'self' https://formsubmit.co", "form-action 'self' https://formsubmit.co",
-      "img-src 'self' data:", "font-src 'self'", "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'"]) expect(csp).toContain(d)
+      "img-src 'self' data:", "font-src 'self' data:", "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'"]) expect(csp).toContain(d)
     expect(csp).toContain(`style-src 'self' '${widgetStyleHash()}'`)
     expect(csp).not.toContain('unsafe-inline')
     expect(csp).not.toContain('unsafe-eval')

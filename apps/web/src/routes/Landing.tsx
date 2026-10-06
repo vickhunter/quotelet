@@ -4,6 +4,7 @@ import { getTemplate, listTemplates, buildLeadMessage } from '@quotelet/core'
 import type { Config, Quote } from '@quotelet/core/types'
 import { QuoteWidget } from '../components/QuoteWidget'
 import { Waitlist } from '../components/Waitlist'
+import { devSnippet } from '../lib/share'
 import { SiteHeader, SiteFooter, Phone } from '../components/Chrome'
 import './landing.css'
 
@@ -17,8 +18,7 @@ function messageFor(config: Config, quote: Quote | null, name: string) {
   return buildLeadMessage(config, quote, { name }, 'owner')
 }
 
-const snippet = () => `<div data-quotelet data-config-url="/painting.json"></div>
-<script src="${window.location.origin}/quotelet.js" defer></script>`
+const snippet = () => devSnippet(window.location.origin)
 
 export function Landing() {
   const [demo, setDemo] = useState<(typeof DEMOS)[number]['id']>('painting-en')

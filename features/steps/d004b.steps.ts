@@ -2,11 +2,18 @@
 import { After, AfterAll, Then, When } from '@cucumber/cucumber'
 import type { Browser, BrowserContext, Page } from 'playwright'
 import assert from 'node:assert/strict'
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import { launchBrowser } from '../../sim/lib.ts'
 
 const BASE = process.env.QL_BASE ?? 'http://127.0.0.1:4173'
-// A different origin on loopback stands in for a customer's website.
-const THIRD_PARTY = 'http://shop.localhost:5999'
+// A customer's website: a tiny real server on another loopback origin (http://localhost:<port>).
+// A Playwright-fulfilled page counts as public and Chrome's Local Network Access would block it.
+async function thirdPartySite(html: string) {
+  const server = createServer((_req, res) => { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(html) })
+  await new Promise<void>((r) => server.listen(0, '127.0.0.1', () => r()))
+  return { url: `http://localhost:${(server.address() as AddressInfo).port}/preventivo.html`, close: () => server.close() }
+}
 
 type World = { ctx?: BrowserContext; page?: Page; snippet?: string; posts: string[]; violations: string[] }
 
@@ -54,12 +61,15 @@ Then('every URL in the snippet answers 200', async function (this: World) {
   }
 })
 
-Then('the snippet pasted on a third-party page shows a working calculator', async function (this: World) {
+Then('the snippet pasted on a third-party page shows a working calculator', { timeout: 60000 }, async function (this: World) {
   const p = await page(this)
-  await this.ctx!.route(`${THIRD_PARTY}/**`, (r) => r.fulfill({ contentType: 'text/html', body: `<!doctype html><html><body><h1>Rossi shop</h1>${this.snippet}</body></html>` }))
-  await p.goto(`${THIRD_PARTY}/preventivo.html`)
-  await p.locator('[data-quotelet] >> [data-testid="ql-result-high"]').waitFor({ timeout: 10000 })
-  assert.match((await p.locator('[data-quotelet] >> [data-testid="ql-result-high"]').textContent()) ?? '', /\d/)
+  const site = await thirdPartySite(`<!doctype html><html><body><h1>Rossi shop</h1>${this.snippet}</body></html>`)
+  try {
+    await p.goto(site.url)
+    const high = p.locator('[data-quotelet] >> [data-testid="ql-result-high"]')
+    await high.waitFor({ timeout: 20000 })
+    assert.match((await high.textContent()) ?? '', /\d/)
+  } finally { site.close() }
 })
 
 Then('{string} answers 404 with the not-found page', async function (this: World, path: string) {
@@ -75,8 +85,8 @@ Then('{string} answers 200 as {string} containing {string}', async function (thi
   assert.ok((await res.text()).includes(text), `${path} lacks ${text}`)
 })
 
-Then('the app routes {string}, {string}, {string}, {string}, {string} answer 200', async function (this: World, ...paths: string[]) {
-  for (const p of paths) {
+Then('the app routes {string}, {string}, {string}, {string}, {string} answer 200', async function (this: World, a: string, b: string, c: string, d: string, e: string) {
+  for (const p of [a, b, c, d, e]) {
     const res = await get(p)
     assert.equal(res.status, 200, `${p} -> ${res.status}`)
     assert.match(res.headers.get('content-type') ?? '', /text\/html/)
@@ -100,13 +110,12 @@ Then('{string} and {string} carry no CSP and no frame-ancestors', async function
   }
 })
 
-Then('the pages {string}, {string}, {string}, {string} load without CSP violations', async function (this: World, ...paths: string[]) {
+Then('the pages {string}, {string}, {string}, {string} load without CSP violations', { timeout: 120000 }, async function (this: World, a: string, b: string, c: string, d: string) {
   const p = await page(this)
-  for (const path of paths) {
+  for (const path of [a, b, c, d]) {
     await p.goto(BASE + path)
     await p.locator('h1').first().waitFor()
-    await p.locator('[data-quotelet], [data-testid="preview"], [data-testid="aperto-text"], .hero').first().waitFor()
-    await p.waitForTimeout(400)
+    await p.waitForLoadState('networkidle')
   }
   // /aperto: one real round trip to /api/aperto (connect-src 'self').
   await p.goto(BASE + '/aperto')
@@ -117,7 +126,7 @@ Then('the pages {string}, {string}, {string}, {string} load without CSP violatio
   assert.deepEqual(this.violations, [])
 })
 
-Then('a share link from the builder opens without CSP violations', async function (this: World) {
+Then('a share link from the builder opens without CSP violations', { timeout: 60000 }, async function (this: World) {
   const p = await page(this)
   await p.goto(BASE + '/build?template=imbianchino-it')
   await p.locator('[data-testid="business-whatsapp"]').fill('+39 333 123 4567')

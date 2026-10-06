@@ -94,3 +94,21 @@ section { scroll-margin-top: 80px; }
 .waitlist .input { flex: 1 1 220px; border-radius: 999px; padding-inline: 18px; }
 .waitlist-done { display: flex; align-items: center; gap: 10px; font-weight: 600; min-height: 48px; }
 .waitlist-done svg { width: 22px; height: 22px; color: var(--wa); }
+
+/* segmented picker (native radios): language choice on /aperto and /q */
+.seg-group { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 6px; }
+.seg-group legend { padding: 0; margin-bottom: 6px; }
+.seg { display: inline-flex; justify-self: start; max-width: 100%; padding: 3px; gap: 2px; border-radius: 999px; background: var(--paper-2); }
+.seg-opt { position: relative; display: inline-flex; }
+.seg-opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.seg-opt span { display: inline-grid; place-items: center; min-width: 48px; min-height: 44px; padding: 0 12px; border-radius: 999px; font: 600 14px/1 var(--mono); color: var(--ink-2); transition: background .15s, color .15s; }
+.seg-opt input:hover + span { color: var(--ink); }
+.seg-opt input:checked + span { background: var(--ink); color: var(--paper); }
+.seg-opt input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+
+/* spinner */
+.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--line); border-top-color: var(--ink); animation: ql-spin .8s linear infinite; flex: none; }
+@keyframes ql-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+

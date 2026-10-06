@@ -19,4 +19,6 @@ const widgetDev = (): Plugin => ({
 export default defineConfig({
   plugins: [react(), widgetDev()],
   build: { outDir: 'dist', emptyOutDir: true },
+  // H-01: /api/aperto runs on the local serve script (APERTUS_MOCK=1 bun run serve).
+  server: { proxy: { '/api': 'http://127.0.0.1:4173' } },
 })

@@ -6,6 +6,7 @@ import { builderReducer, canShare, initBuilder, whatsappProblem, type BuilderAct
 import { loadDraft, saveDraft } from '../lib/draft'
 import { formulaErrorMessage } from '../lib/formulaError'
 import { embedSnippet, shareLink } from '../lib/share'
+import { useCopy } from '../lib/useCopy'
 import { QuoteWidget } from '../components/QuoteWidget'
 import { SiteHeader, Phone } from '../components/Chrome'
 import './build.css'
@@ -41,19 +42,6 @@ function NumInput({ value, onValue, ...rest }: { value: number | undefined; onVa
       }}
     />
   )
-}
-
-function useCopy() {
-  const [copied, setCopied] = useState<string | null>(null)
-  const copy = async (what: string, text: string) => {
-    try { await navigator.clipboard.writeText(text) } catch {
-      const ta = Object.assign(document.createElement('textarea'), { value: text })
-      document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove()
-    }
-    setCopied(what)
-    window.setTimeout(() => setCopied((c) => (c === what ? null : c)), 1600)
-  }
-  return { copied, copy }
 }
 
 function FieldEditor({ field, dispatch }: { field: Field; dispatch: React.Dispatch<BuilderAction> }) {

@@ -7,6 +7,7 @@ import { Build } from './routes/Build'
 import { Share } from './routes/Share'
 import { ItPainters } from './routes/ItPainters'
 import { NotFound } from './routes/NotFound'
+import { Aperto } from './routes/Aperto'
 
 const rootRoute = createRootRoute({
   component: Outlet,
@@ -20,6 +21,7 @@ const routeTree = rootRoute.addChildren([
   }),
   createRoute({ getParentRoute: () => rootRoute, path: '/q', component: Share }),
   createRoute({ getParentRoute: () => rootRoute, path: '/it/quanto-costa-imbiancare', component: ItPainters }),
+  createRoute({ getParentRoute: () => rootRoute, path: '/aperto', component: Aperto }),
 ])
 
 const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true })

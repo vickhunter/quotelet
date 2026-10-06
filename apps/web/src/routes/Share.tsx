@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { decodeConfig } from '@quotelet/core'
+import { cleanLeadName } from '@quotelet/core/handoff'
+import type { Config, Quote } from '@quotelet/core/types'
 import { QuoteWidget } from '../components/QuoteWidget'
+import { LangPicker } from '../components/LangPicker'
+import { leadText, messageKey, requestMessage, waUrl, type Lang } from '../lib/aperto'
 import { useMeta } from '../lib/useMeta'
 import './share.css'
 
 const readHash = () => new URLSearchParams(window.location.hash.slice(1)).get('c') ?? ''
+type Msg = { key: string; lang: Lang; status: 'loading' | 'ready' | 'fallback'; text?: string }
 
 /** /q#c=<base64url config>. The config lives in the fragment, so it never reaches a server. */
 export function Share() {
@@ -15,11 +21,14 @@ export function Share() {
     return () => window.removeEventListener('hashchange', on)
   }, [])
   useMeta('Quote calculator')
+  const config = useMemo(() => { const r = encoded ? decodeConfig(encoded) : null; return r?.ok ? r.config : null }, [encoded])
 
   return (
     <main className="share-page">
       {encoded ? (
-        <QuoteWidget config={encoded} testId="share-widget" className="share-widget" />
+        <>
+          {config ? <SharedCalculator key={encoded} config={config} encoded={encoded} /> : <QuoteWidget config={encoded} testId="share-widget" className="share-widget" />}
+        </>
       ) : (
         <div className="share-empty">
           <h1>No calculator in this link</h1>
@@ -28,5 +37,72 @@ export function Share() {
         </div>
       )}
     </main>
+  )
+}
+
+/** Widget plus the optional "message language" toggle. With a language picked, the WhatsApp CTA
+ *  sends the server's text (core amounts) instead of core's default message; on any failure the
+ *  widget's own CTA runs unchanged. */
+function SharedCalculator({ config, encoded }: { config: Config; encoded: string }) {
+  const [quote, setQuote] = useState<Quote | null>(null)
+  const [lang, setLang] = useState<Lang | null>(null)
+  const [msg, setMsg] = useState<Msg | null>(null)
+  const wrap = useRef<HTMLDivElement>(null)
+  const live = useRef({ config, quote, msg, lang })
+  live.current = { config, quote, msg, lang }
+
+  // Fetch the message for the current quote + language (debounced while the customer types).
+  useEffect(() => {
+    if (!lang || !quote) return
+    const key = messageKey(quote, lang)
+    if (msg?.key === key && msg.status !== 'loading') return
+    setMsg({ key, lang, status: 'loading' })
+    const ac = new AbortController()
+    const t = window.setTimeout(async () => {
+      try {
+        const r = await requestMessage(config, quote, lang, { signal: ac.signal })
+        if (!ac.signal.aborted) setMsg(r.ok ? { key, lang, status: 'ready', text: r.text } : { key, lang, status: 'fallback' })
+      } catch { /* aborted */ }
+    }, 300)
+    return () => { ac.abort(); window.clearTimeout(t) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, quote, config])
+
+  // Take over the widget's WhatsApp click only when a fresh message for this exact quote is ready.
+  useEffect(() => {
+    const el = wrap.current!
+    const onClick = (e: MouseEvent) => {
+      const { config: c, quote: q, msg: m, lang: l } = live.current
+      const host = el.querySelector('[data-testid="share-widget"]')
+      const root = host?.shadowRoot
+      const btn = root?.querySelector('[data-testid="ql-cta-whatsapp"]')
+      if (!host || !btn || !e.composedPath().includes(btn)) return
+      if (!q || q.error || !l || !m || m.status !== 'ready' || !m.text || m.key !== messageKey(q, l)) return
+      let name: string
+      try { name = cleanLeadName((root!.querySelector('[data-testid="ql-name"]') as HTMLInputElement | null)?.value) } catch { return } // widget shows its hint
+      e.stopPropagation()
+      e.preventDefault()
+      host.dispatchEvent(new CustomEvent('quotelet:lead', { detail: { channel: 'whatsapp', id: c.id }, bubbles: true, composed: true }))
+      window.open(waUrl(c, leadText(c, q, m.text, name)), '_blank', 'noopener')
+    }
+    el.addEventListener('click', onClick, true)
+    return () => el.removeEventListener('click', onClick, true)
+  }, [])
+
+  const current = lang && quote && msg && msg.key === messageKey(quote, lang) ? msg : null
+  return (
+    <div className="share-stack" ref={wrap}>
+      <QuoteWidget config={encoded} testId="share-widget" className="share-widget" onQuote={setQuote} />
+      <section className="msg-lang" aria-label="Message language">
+        <LangPicker name="msg-lang" legend="Message language" value={lang} onChange={setLang} testIdPrefix="msg-lang" />
+        {lang && (
+          <div className="msg-preview" data-testid="msg-preview" data-lang={current?.lang ?? lang} data-status={current?.status ?? 'loading'} aria-live="polite" lang={lang}>
+            {current?.status === 'ready' ? current.text
+              : current?.status === 'fallback' ? <span className="hint">Translation unavailable. WhatsApp uses the standard message.</span>
+              : <span className="hint"><span className="spinner" aria-hidden /> Writing…</span>}
+          </div>
+        )}
+      </section>
+    </div>
   )
 }

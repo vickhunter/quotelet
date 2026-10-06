@@ -5,3 +5,9 @@
 .share-empty h1 { font-size: 28px; }
 .share-foot { font-size: 13px; color: var(--ink-3); text-decoration: none; }
 .share-foot:hover { color: var(--ink); }
+.share-stack { width: 100%; max-width: 520px; display: grid; gap: 14px; }
+.msg-lang { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.msg-preview { font-size: 15px; line-height: 1.5; color: var(--ink); padding: 10px 12px; border-radius: 12px 12px 12px 4px; background: color-mix(in srgb, var(--wa) 9%, var(--card)); overflow-wrap: anywhere; white-space: pre-line; }
+.msg-preview .hint { display: inline-flex; align-items: center; gap: 8px; }
+.msg-preview .spinner { width: 14px; height: 14px; border-width: 2px; }
+@media (max-width: 420px) { .msg-lang .seg { display: flex; justify-self: stretch; } .msg-lang .seg-opt { flex: 1; } .msg-lang .seg-opt span { width: 100%; min-width: 0; } }

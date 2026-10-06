@@ -17,7 +17,7 @@ export function createClient(opts: ClientOptions): ChatClient {
   return {
     model: opts.model,
     async chat(messages: ChatMessage[], o = {}): Promise<ChatResult> {
-      const headers: Record<string, string> = { "content-type": "application/json", accept: "application/json" };
+      const headers: Record<string, string> = { "content-type": "application/json", accept: "application/json", "user-agent": "quotelet-aperto/0.1 (+https://github.com/vickhunter/quotelet)" }; // some gateways (Public AI) require a User-Agent
       if (opts.apiKey) headers.authorization = `Bearer ${opts.apiKey}`;
       const body: Record<string, unknown> = {
         model: opts.model, messages, temperature: o.temperature ?? 0, max_tokens: o.maxTokens ?? opts.maxTokens ?? 1500, stream: false,

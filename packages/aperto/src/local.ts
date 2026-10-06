@@ -1,14 +1,14 @@
 // Local wiring for /api/aperto on 127.0.0.1:4173 (scripts/serve.ts and harness/server.ts).
 // Loads the git-ignored .env.local; APERTUS_MOCK=1 replays recorded answers (no key needed).
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { loadEnvLocal, readApertusEnv } from "./env.ts";
+import { loadEnvLocal, readApertusEnv, REPO_ROOT } from "./env.ts";
 import { createApertoHandler } from "./proxy.ts";
 
 export const APERTO_PATH = "/api/aperto";
 
 /** Handler for local servers: reads .env.local once; generous rate limit in mock mode so BDD runs don't hit 429. */
 export function localApertoHandler(): (req: Request) => Promise<Response> {
-  const env = loadEnvLocal();
+  const env = loadEnvLocal(REPO_ROOT, { ...process.env }); // copy: never leaks .env.local into process.env
   const e = readApertusEnv(env);
   const rate = Number(env.APERTUS_RATE_PER_MINUTE) || (e.mock && !e.configured ? 600 : undefined);
   // Local servers are hit directly by the browser, so X-Forwarded-For is not trusted here.

@@ -146,8 +146,12 @@ export async function evalProfile(p: Profile, cases: EvalCase[], log: (s: string
 }
 
 export function summaryTable(models: ModelSummary[], env: Env = {}): string {
-  const pin = Number(env.APERTUS_PRICE_IN_PER_MTOK), pout = Number(env.APERTUS_PRICE_OUT_PER_MTOK);
-  const cost = (m: ModelSummary) => Number.isFinite(pin) && Number.isFinite(pout) && pin >= 0 && pout >= 0 ? ((m.tokensIn * pin + m.tokensOut * pout) / 1e6 / m.cases).toFixed(5) : "n/a";
+  // Optional price per 1M tokens, per eval profile: APERTUS_PRICE_SMALL / _LARGE / _MODEL = "in/out" (e.g. "0.10/0.20").
+  const cost = (m: ModelSummary) => {
+    const raw = (env[`APERTUS_PRICE_${m.label.toUpperCase().replace(/[^A-Z0-9]/g, "_")}`] ?? "").trim();
+    const [pin, pout] = raw.split("/").map(Number);
+    return raw && Number.isFinite(pin) && Number.isFinite(pout) && m.cases ? `$${((m.tokensIn * pin + m.tokensOut * pout) / 1e6 / m.cases).toFixed(5)}` : "n/a";
+  };
   const rows = models.map((m) => `| ${m.model} | ${m.valid}/${m.cases} (${pct(m.validRate)}) | ${m.firstTry} / ${m.repaired} | ${m.matched}/${m.cases} (${pct(m.matchRate)}) | ${pct(m.inputMatchRate)} | ${pct(m.clearMatchRate)} / ${pct(m.ambiguousMatchRate)} | ${(m.latencyP50Ms / 1000).toFixed(1)} s / ${(m.latencyP95Ms / 1000).toFixed(1)} s | ${m.tokensPerCalc} | ${cost(m)} |`);
   return ["| Model | Valid config | 1st try / after repair | Quote match (all 3 inputs) | Inputs matched | Clear / ambiguous lists | Latency p50 / p95 | Tokens per calculator | Cost per calculator |", "|---|---|---|---|---|---|---|---|---|", ...rows].join("\n");
 }

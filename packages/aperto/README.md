@@ -76,9 +76,18 @@ await draftMessage(config, quote, "it", { client }) // { ok:true, text, source, 
 | `APERTUS_API_KEY` | bearer token; optional for local servers. Server-side only |
 | `APERTUS_MODEL_SMALL` / `APERTUS_MODEL_LARGE` | eval: compare two models (8B vs 70B) on the same endpoint |
 | `APERTUS_MOCK=1` | use the recorded answers in `fixtures/` (no network, no key): the 4 `EXAMPLES` + the 30 eval lists |
-| `APERTUS_TIMEOUT_MS` | per-call timeout (default 20000) |
+| `APERTUS_TIMEOUT_MS` | per-call timeout (default 20000; the eval uses at least 60000) |
+| `APERTUS_RATE_PER_MINUTE` | per-IP token bucket size/refill (default 10; local mock server defaults to 600 so BDD runs don't hit 429) |
+| `APERTUS_PRICE_SMALL` / `APERTUS_PRICE_LARGE` / `APERTUS_PRICE_MODEL` | eval only: `in/out` USD per 1M tokens for the cost column |
 
-`.env.local` at the repo root is loaded by the local server and the eval (it never overrides real env vars). It is git-ignored (`.env*`).
+The client sends `User-Agent: quotelet-aperto/0.1`, which some gateways (for example Public AI) require.
+
+`.env.local` at the repo root is loaded by the local servers (`scripts/serve.ts`, `harness/server.ts`) and by the eval. It never overrides real env vars, and the servers read it into a copy, not into `process.env`. It is git-ignored (`.env*`). On Vercel, set the vars in the project settings (preview environment only for H-01).
+
+## Local and Vercel wiring
+- `bun run serve` (built web app) and `bun harness/server.ts` (widget harness) both route `POST /api/aperto` to `localApertoHandler()` on 127.0.0.1:4173. With `APERTUS_MOCK=1` and no key you get the recorded answers.
+- Vite dev server (5173): proxy `/api` to `http://127.0.0.1:4173` (UI/UX's `vite.config.ts`, not changed here).
+- Vercel: `apps/web/api/aperto.ts` re-exports the handler as `export default { fetch }`. Two things to check on the first preview deploy: the function bundles files outside `apps/web` (`packages/aperto`, `packages/core`), and the SPA rewrite in `vercel.json` does not shadow `/api/*`. Functions take precedence over rewrites, but only if the deploy includes `apps/web/api` and not just the static `dist` folder.
 
 ## Recorded answers
 `fixtures/recorded-demo.json` and `eval/fixtures/recorded-dry.json` are **hand-authored stand-ins** in the shape Apertus returns (prose, code fences, one broken answer). They are not captured Apertus output. They exist so tests, `APERTUS_MOCK=1` and `eval --dry` run offline. Real numbers come from `bun run eval:aperto` with a configured endpoint.

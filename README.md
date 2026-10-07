@@ -1,17 +1,42 @@
 # Quotelet
 
-Open-source instant quote calculator for service businesses: one script tag or a share link gives visitors a price range with VAT, and the lead goes to the owner's WhatsApp or email. No server, no stored data.
+Open-source instant quote calculator for service businesses. Add one script tag to a site (or share one link) and visitors get a price range with VAT shown. The lead goes to the owner's WhatsApp or email. No backend, no signup, no customer data stored.
 
-Status: local prep package (P-02). No remote yet; the public repo comes after D-003 and D-004 are accepted (D-005).
+**Live demo:** https://quotelet.vercel.app · License: [MIT](LICENSE)
 
-- Spec and interface contract: `docs/design.md` (canonical copy at `[internal notes, not published]`; if they differ, the shared one wins)
-- Acceptance scenarios: `features/quotelet.feature`
-- Persona simulations: `sims/personas.md`
-- Launch drafts (Victor posts): `gtm/launch-drafts.md`
+## What it does
+- **Calculator engine** (`packages/core`): a validated JSON config (number, choice and toggle fields), a safe formula language (no `eval`), min-max range, rounding, VAT, all in integer cents. One formatter (`formatMoney`) prints every amount the same way on every runtime.
+- **Widget** (`packages/widget`): `dist/quotelet.js`, one file under 15 KB gzip, no network calls besides loading itself.
+- **Share link**: the whole calculator lives in the URL fragment (`/q#c=…`), so a business with no website can still send a link.
+- **Builder** (`apps/web`, `/build`): pick a template, set prices and labels, get a share link and an embed snippet. English and Italian.
+- **CLI** (`packages/cli`): list templates, validate configs, compute quotes, make links.
+- **Quotelet Aperto** (`packages/aperto`): describe your prices in plain words; Apertus turns them into a validated calculator (details below).
 
-License: MIT (added with D-005).
+## Run it locally
+Needs [Bun](https://bun.sh) 1.4+ (Node 20+ for the BDD and browser checks).
 
-## Developer quickstart (D-003: engine, widget, CLI)
+```sh
+bun install
+bun run build    # widget + web app into apps/web/dist
+bun run serve    # http://127.0.0.1:4173
+```
+
+Add `APERTUS_MOCK=1` before `bun run serve` to try Quotelet Aperto with recorded answers and no API key.
+
+### Embed the widget
+`bun run build:widget` builds `dist/quotelet.js`. Host it next to a config JSON:
+
+```html
+<div data-quotelet data-config-url="/calc.json"></div>
+<script src="https://<your-host>/quotelet.js" defer></script>
+```
+
+Start from one of the configs in `templates/` (painter, cleaning, movers in Italian; painting in English).
+
+### Tests
+`bun test` (unit) · `bun run bdd --tags @D-003` / `@aperto-api` (Gherkin acceptance; browser scenarios use Playwright chromium against a running `bun run serve`) · `bun run sim:d003` (scripted user journeys, log in `proof/sim-<date>.log`).
+
+## CLI quickstart
 
 ```sh quickstart
 bun install
@@ -21,14 +46,7 @@ bun packages/cli/index.ts quote templates/imbianchino-it.json --set mq=80 --json
 bun packages/cli/index.ts link templates/imbianchino-it.json --base http://127.0.0.1:4173
 ```
 
-Embed (after `bun packages/widget/build.ts` builds `dist/quotelet.js`, ≤15 KB gzip):
-
-```html
-<div data-quotelet data-config-url="/calc.json"></div>
-<script src="https://<host>/quotelet.js" defer></script>
-```
-
-Checks: `bun test` (unit) · `bun run bdd --tags @D-003` (Gherkin, Playwright chromium) · `bun run sim:d003` (personas 1, 3, 4, 5; log in `proof/sim-<date>.log`). Local harness: `bun harness/server.ts` then open `http://127.0.0.1:4173/`.
+Or via the root script: `bun run cli <command>`.
 
 ## Quotelet Aperto (Hack Apertus, Track 2B)
 
